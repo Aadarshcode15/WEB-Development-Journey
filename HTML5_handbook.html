@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="An interactive field guide to every HTML5 tag that matters, organized by purpose with live, runnable examples.">
+<title>The HTML5 Field Guide — Interactive Reference</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' fill='%23f2b84b'%3E%3C/%3E%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --bg:#12141b;
+  --bg-deep:#0d0e13;
+  --surface:#191c25;
+  --surface-2:#1f2330;
+  --surface-3:#262b3a;
+  --border:#2b3040;
+  --border-soft:rgba(255,255,255,.06);
+  --text:#eceef4;
+  --text-dim:#9aa0b6;
+  --text-faint:#5f6579;
+
+  --gold:#f2b84b;
+  --gold-soft:rgba(242,184,75,.14);
+  --coral:#ff7a85;
+  --coral-soft:rgba(255,122,133,.14);
+  --teal:#7fd8c4;
+  --teal-soft:rgba(127,216,196,.14);
+  --lime:#b7d876;
+  --lime-soft:rgba(183,216,118,.14);
+
+  --font-display:'Fraunces',serif;
+  --font-body:'Public Sans',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:18px;
+
+  --topbar-h:60px;
+  --sidebar-w:264px;
+
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important;}
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1100px 480px at 12% -8%, rgba(242,184,75,.06), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(127,216,196,.05), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+::selection{background:var(--gold);color:#1a1300;}
+
+/* scrollbar */
+::-webkit-scrollbar{width:11px;height:11px;}
+::-webkit-scrollbar-track{background:var(--bg-deep);}
+::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:8px;border:2px solid var(--bg-deep);}
+::-webkit-scrollbar-thumb:hover{background:#333850;}
+*{scrollbar-color:var(--surface-3) var(--bg-deep); scrollbar-width:thin;}
+
+a{color:inherit;}
+p{margin:0 0 .7em;}
+p:last-child{margin-bottom:0;}
+
+.skip-link{
+  position:absolute;left:-999px;top:0;background:var(--gold);color:#1a1300;
+  padding:.7em 1.2em;border-radius:0 0 8px 0;z-index:999;font-weight:600;font-family:var(--font-body);
+}
+.skip-link:focus{left:0;}
+
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px;}
+
+/* ============================================================
+   TOP BAR + PROGRESS
+   ============================================================ */
+#progressBar{
+  position:fixed;top:0;left:0;height:2px;width:0%;
+  background:linear-gradient(90deg,var(--coral),var(--gold),var(--teal));
+  z-index:200;transition:width .08s linear;
+}
+
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--topbar-h);
+  display:flex;align-items:center;gap:16px;
+  padding:0 20px;
+  background:rgba(18,20,27,.86);
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--border-soft);
+  z-index:150;
+}
+.brand{
+  display:flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-weight:700;font-size:.92rem;
+  white-space:nowrap;letter-spacing:.01em;
+  flex-shrink:0;
+}
+.brand .bracket{color:var(--coral);}
+.brand .dot{color:var(--gold);}
+.brand small{display:block;font-family:var(--font-body);font-weight:500;color:var(--text-faint);font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;margin-top:1px;}
+
+.menu-toggle{
+  display:none;
+  background:none;border:1px solid var(--border);color:var(--text);
+  width:38px;height:38px;border-radius:var(--radius-sm);
+  align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+  font-size:1.1rem;
+}
+
+.search-wrap{
+  flex:1;max-width:480px;margin-left:auto;
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:999px;padding:0 8px 0 16px;height:40px;
+  transition:border-color .15s var(--ease);
+}
+.search-wrap:focus-within{border-color:var(--gold);}
+.search-wrap svg{flex-shrink:0;color:var(--text-faint);width:16px;height:16px;}
+#searchInput{
+  flex:1;background:none;border:none;outline:none;color:var(--text);
+  font-family:var(--font-body);font-size:.9rem;min-width:0;
+}
+#searchInput::placeholder{color:var(--text-faint);}
+.search-count{
+  font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);
+  white-space:nowrap;flex-shrink:0;
+}
+.search-nav{display:flex;gap:2px;flex-shrink:0;}
+.search-nav button{
+  background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);
+  width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:.7rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.search-nav button:hover{color:var(--gold);border-color:var(--gold);}
+.search-nav button:disabled{opacity:.3;cursor:default;}
+.search-nav button:disabled:hover{color:var(--text-dim);border-color:var(--border);}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.layout{
+  display:flex;
+  padding-top:var(--topbar-h);
+  max-width:1440px;
+  margin:0 auto;
+}
+
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  position:sticky;top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h));
+  overflow-y:auto;
+  padding:26px 14px 40px 24px;
+  border-right:1px solid var(--border-soft);
+}
+.sidebar-label{
+  font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-faint);padding:0 10px;margin-bottom:10px;
+}
+.sidebar nav{display:flex;flex-direction:column;gap:1px;}
+.sidebar nav a{
+  display:flex;align-items:baseline;gap:10px;
+  padding:7px 10px;border-radius:8px;
+  text-decoration:none;color:var(--text-dim);font-size:.86rem;
+  border-left:2px solid transparent;
+  transition:background .12s,color .12s;
+}
+.sidebar nav a .n{font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);flex-shrink:0;}
+.sidebar nav a:hover{background:var(--surface);color:var(--text);}
+.sidebar nav a.active{background:var(--gold-soft);color:var(--gold);border-left-color:var(--gold);}
+.sidebar nav a.active .n{color:var(--gold);}
+
+.wizard-launch{
+  margin-top:18px;width:100%;
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface-2);border:1px dashed var(--border);
+  color:var(--text);padding:12px 14px;border-radius:var(--radius-md);
+  cursor:pointer;font-family:var(--font-body);font-size:.84rem;font-weight:600;
+  text-align:left;
+}
+.wizard-launch:hover{border-color:var(--teal);background:var(--surface-3);}
+.wizard-launch .ic{font-size:1.05rem;flex-shrink:0;}
+.wizard-launch span small{display:block;font-weight:400;color:var(--text-faint);font-size:.74rem;margin-top:1px;}
+
+.sidebar-overlay{display:none;}
+
+main{
+  flex:1;min-width:0;
+  padding:0 clamp(20px,4vw,56px) 100px;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  padding:56px 0 44px;
+  display:grid;grid-template-columns:1.15fr .85fr;gap:44px;
+  align-items:center;
+  border-bottom:1px solid var(--border-soft);
+  margin-bottom:52px;
+}
+.hero-eyebrow{
+  font-family:var(--font-mono);font-size:.76rem;color:var(--teal);
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.hero-eyebrow::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px var(--teal-soft);}
+.hero h1{
+  font-family:var(--font-display);font-weight:600;font-size:clamp(2.1rem,4.4vw,3.35rem);
+  line-height:1.06;margin:0 0 18px;letter-spacing:-.01em;
+}
+.hero h1 em{color:var(--gold);font-style:normal;}
+.hero-sub{
+  font-size:1.04rem;color:var(--text-dim);max-width:52ch;margin-bottom:26px;
+}
+.hero-sub code{color:var(--teal);}
+.hero-stats{display:flex;gap:28px;flex-wrap:wrap;}
+.hero-stat b{
+  display:block;font-family:var(--font-display);font-weight:600;font-size:1.7rem;color:var(--text);
+}
+.hero-stat span{font-size:.76rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;}
+
+/* specimen card */
+.specimen{
+  position:relative;
+  background:linear-gradient(165deg,var(--surface) 0%,var(--surface-2) 100%);
+  border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:30px 28px 26px;min-height:270px;
+  display:flex;flex-direction:column;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.03);
+}
+.specimen::before{
+  content:'';position:absolute;top:0;left:28px;right:28px;height:1px;
+  background:repeating-linear-gradient(90deg,var(--border) 0 6px,transparent 6px 11px);
+}
+.specimen-label{
+  font-family:var(--font-mono);font-size:.68rem;color:var(--text-faint);
+  display:flex;justify-content:space-between;letter-spacing:.06em;text-transform:uppercase;margin-bottom:22px;
+}
+.specimen-label #specimenIndex{color:var(--gold);}
+.specimen-tag{
+  font-family:var(--font-mono);font-weight:700;font-size:clamp(1.7rem,3.4vw,2.3rem);
+  color:var(--coral);margin-bottom:14px;line-height:1;
+  transition:opacity .25s var(--ease);
+}
+.specimen-purpose{
+  font-family:var(--font-display);font-style:italic;font-size:1.06rem;color:var(--text);
+  line-height:1.5;flex:1;transition:opacity .25s var(--ease);
+}
+.specimen.fade .specimen-tag,.specimen.fade .specimen-purpose{opacity:0;}
+.specimen-foot{
+  display:flex;justify-content:space-between;align-items:center;margin-top:20px;
+  border-top:1px solid var(--border-soft);padding-top:14px;
+}
+.specimen-dots{display:flex;gap:5px;}
+.specimen-dots span{width:5px;height:5px;border-radius:50%;background:var(--border);}
+.specimen-dots span.on{background:var(--gold);}
+.specimen-next{
+  background:none;border:1px solid var(--border);color:var(--text-dim);
+  font-family:var(--font-mono);font-size:.7rem;padding:6px 12px;border-radius:999px;cursor:pointer;
+}
+.specimen-next:hover{border-color:var(--gold);color:var(--gold);}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;padding-top:36px;}
+}
+
+/* ============================================================
+   SECTIONS — shared
+   ============================================================ */
+.handbook-section{padding:26px 0 54px;border-bottom:1px solid var(--border-soft);scroll-margin-top:calc(var(--topbar-h) + 16px);}
+.handbook-section:last-of-type{border-bottom:none;}
+
+.section-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:18px;}
+.section-num{
+  font-family:var(--font-mono);font-weight:600;font-size:.82rem;color:var(--gold);
+  border:1px solid var(--gold-soft);background:var(--gold-soft);
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;margin-top:2px;
+}
+.section-head h2{
+  font-family:var(--font-display);font-weight:600;font-size:1.55rem;margin:0 0 6px;letter-spacing:-.01em;
+}
+.section-intro{color:var(--text-dim);max-width:70ch;font-size:.95rem;}
+.section-intro code{color:var(--teal);}
+
+.subhead{
+  font-family:var(--font-mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-faint);margin:26px 0 10px;padding-top:2px;
+}
+
+/* spec rows (data-driven entry tables) */
+.entries{display:flex;flex-direction:column;border-top:1px solid var(--border-soft);}
+.spec-row{
+  display:grid;grid-template-columns:190px 1fr;gap:18px;
+  padding:13px 12px;border-bottom:1px solid var(--border-soft);
+  border-left:2px solid transparent;
+  transition:background .15s,border-color .15s;
+}
+.spec-row:hover{background:var(--surface);}
+.spec-row.is-match{background:var(--gold-soft);}
+.spec-row.is-current{border-left-color:var(--gold);background:var(--gold-soft);}
+.tag-chip{
+  font-family:var(--font-mono);font-weight:600;font-size:.82rem;color:var(--coral);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;align-self:start;
+}
+.spec-purpose{font-size:.9rem;color:var(--text);margin:0;}
+.spec-note{font-size:.82rem;color:var(--text-faint);margin:.35em 0 0;}
+.spec-example{font-family:var(--font-mono);font-size:.78rem;color:var(--lime);margin-top:.35em;}
+
+@media (max-width:640px){
+  .spec-row{grid-template-columns:1fr;gap:5px;}
+}
+
+/* inline code mentions in prose */
+code.inline{
+  font-family:var(--font-mono);background:var(--surface-2);color:var(--teal);
+  padding:.1em .42em;border-radius:5px;font-size:.87em;border:1px solid var(--border-soft);
+}
+
+/* code panels */
+.code-panel{
+  background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--radius-md);
+  overflow:hidden;margin:16px 0;
+}
+.code-panel-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;border-bottom:1px solid var(--border);background:var(--surface);
+}
+.code-panel-bar .lang{font-family:var(--font-mono);font-size:.7rem;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;}
+.copy-btn{
+  background:none;border:1px solid var(--border);color:var(--text-dim);
+  font-family:var(--font-mono);font-size:.7rem;padding:5px 11px;border-radius:6px;cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+}
+.copy-btn:hover{border-color:var(--gold);color:var(--gold);}
+.copy-btn.copied{border-color:var(--lime);color:var(--lime);}
+.code-panel pre{margin:0;padding:16px 18px;overflow-x:auto;}
+.code-panel code{
+  font-family:var(--font-mono);font-size:.82rem;line-height:1.65;white-space:pre;color:var(--text);
+}
+/* highlight.js token colors */
+.hljs-tag{color:var(--text-faint);}
+.hljs-name{color:var(--coral);}
+.hljs-attr{color:var(--teal);}
+.hljs-string{color:var(--lime);}
+.hljs-comment{color:var(--text-faint);font-style:italic;}
+.hljs-meta,.hljs-doctag{color:var(--gold);}
+.hljs-meta-string{color:var(--lime);}
+
+/* demo grids */
+.demo{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;align-items:stretch;
+}
+.demo .code-panel{margin:0;}
+.live-panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:16px 18px;display:flex;flex-direction:column;
+}
+.live-label{
+  font-family:var(--font-mono);font-size:.7rem;color:var(--lime);letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:12px;display:flex;align-items:center;gap:6px;
+}
+.live-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--lime);}
+.live-stage{flex:1;display:flex;align-items:center;}
+.live-stage.stack{flex-direction:column;align-items:stretch;gap:10px;}
+
+@media (max-width:800px){
+  .demo{grid-template-columns:1fr;}
+}
+
+/* callouts */
+.callout{
+  border-left:3px solid var(--teal);background:var(--teal-soft);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  padding:13px 16px;margin:16px 0;font-size:.89rem;color:var(--text);
+}
+.callout.warn{border-color:var(--gold);background:var(--gold-soft);}
+.callout.danger{border-color:var(--coral);background:var(--coral-soft);}
+.callout b{color:inherit;}
+.callout code{font-family:var(--font-mono);color:inherit;background:rgba(255,255,255,.08);padding:.1em .4em;border-radius:4px;font-size:.9em;}
+
+/* chips (void elements, deprecated, global attrs) */
+.chip-grid{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;}
+.el-chip{
+  font-family:var(--font-mono);font-size:.84rem;font-weight:600;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:8px 13px;color:var(--teal);
+}
+.el-chip.deprecated{
+  display:flex;flex-direction:column;gap:3px;color:var(--coral);
+  text-decoration:line-through;text-decoration-color:rgba(255,122,133,.5);
+  min-width:140px;
+}
+.el-chip.deprecated .use-instead{
+  font-family:var(--font-body);font-weight:400;font-size:.72rem;color:var(--lime);
+  text-decoration:none;
+}
+
+/* attribute table */
+.attr-grid{display:flex;flex-direction:column;border-top:1px solid var(--border-soft);}
+
+/* checklist */
+.checklist{display:flex;flex-direction:column;gap:8px;margin:16px 0;}
+.check-item{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:13px 15px;cursor:pointer;user-select:none;
+}
+.check-item .box{
+  width:20px;height:20px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;transition:all .12s;
+}
+.check-item.on .box{background:var(--lime);border-color:var(--lime);}
+.check-item .box svg{width:12px;height:12px;opacity:0;transition:opacity .12s;color:#12141b;}
+.check-item.on .box svg{opacity:1;}
+.check-item.on p{color:var(--text-dim);}
+.check-item p{margin:0;font-size:.89rem;}
+.check-item p b{color:var(--text);}
+.check-item.on p b{color:var(--text-dim);text-decoration:line-through;text-decoration-color:var(--text-faint);}
+
+/* entity table */
+.entity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin:16px 0;}
+.entity-cell{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:10px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.entity-cell code{font-family:var(--font-mono);font-size:.8rem;color:var(--teal);}
+.entity-cell .glyph{font-family:var(--font-display);font-size:1.15rem;color:var(--gold);}
+
+/* skeleton wireframe (section 3) */
+.wireframe{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:14px;font-family:var(--font-mono);font-size:.74rem;color:var(--text-faint);
+}
+.wf-box{border:1px dashed var(--border);border-radius:6px;padding:10px;margin-bottom:8px;}
+.wf-box:last-child{margin-bottom:0;}
+.wf-box .wf-tag{color:var(--coral);font-weight:600;}
+.wf-row{display:flex;gap:8px;}
+.wf-row .wf-box{flex:1;margin-bottom:0;}
+
+/* form showcase */
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:.76rem;color:var(--text-faint);font-family:var(--font-mono);}
+.field input,.field select,.field textarea{
+  background:var(--bg-deep);border:1px solid var(--border);color:var(--text);
+  padding:8px 10px;border-radius:7px;font-family:var(--font-body);font-size:.86rem;width:100%;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);outline:none;}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.type-showcase{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:16px 0;}
+
+/* buttons (generic) */
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:.84rem;
+  border-radius:8px;padding:9px 16px;cursor:pointer;border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text);
+}
+.btn:hover{border-color:var(--teal);}
+.btn.primary{background:var(--gold);color:#1a1300;border-color:var(--gold);}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.ghost{background:none;}
+
+/* dialog */
+dialog{
+  background:var(--surface);color:var(--text);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:0;max-width:480px;width:92vw;
+  box-shadow:0 40px 80px -20px rgba(0,0,0,.7);
+}
+dialog::backdrop{background:rgba(6,7,10,.72);backdrop-filter:blur(3px);}
+.dialog-body{padding:26px 26px 22px;}
+.dialog-body h3{font-family:var(--font-display);font-size:1.25rem;margin:0 0 10px;}
+.dialog-body p{color:var(--text-dim);font-size:.92rem;}
+.dialog-close-row{display:flex;justify-content:flex-end;padding:14px 22px;border-top:1px solid var(--border-soft);}
+
+/* wizard dialog specifics */
+#wizardDialog{max-width:520px;}
+.wizard-progress{display:flex;gap:5px;padding:20px 26px 0;}
+.wizard-progress span{flex:1;height:3px;border-radius:2px;background:var(--border);}
+.wizard-progress span.done{background:var(--gold);}
+.wizard-q{font-family:var(--font-display);font-size:1.15rem;line-height:1.4;margin:18px 0 22px;}
+.wizard-actions{display:flex;gap:10px;}
+.wizard-actions .btn{flex:1;}
+.wizard-result{display:none;}
+.wizard-result.show{display:block;}
+.wizard-result .tag-chip{font-size:1.4rem;display:block;margin-bottom:10px;}
+
+/* popover */
+[popover]{
+  background:var(--surface);color:var(--text);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:8px;margin:auto 0 0 8px;
+  box-shadow:0 20px 50px -15px rgba(0,0,0,.6);
+}
+[popover] a{
+  display:block;padding:9px 14px;border-radius:7px;text-decoration:none;font-size:.88rem;color:var(--text-dim);
+}
+[popover] a:hover{background:var(--surface-2);color:var(--gold);}
+
+/* toast */
+#toast{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--surface-3);border:1px solid var(--border);color:var(--text);
+  padding:12px 20px;border-radius:999px;font-size:.86rem;box-shadow:0 20px 40px -10px rgba(0,0,0,.6);
+  z-index:300;opacity:0;pointer-events:none;transition:all .25s var(--ease);
+  display:flex;align-items:center;gap:8px;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast .dot{width:7px;height:7px;border-radius:50%;background:var(--lime);}
+
+/* back to top */
+#backToTop{
+  position:fixed;bottom:26px;right:26px;width:44px;height:44px;border-radius:50%;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:120;
+  opacity:0;pointer-events:none;transform:translateY(10px);transition:all .25s var(--ease);
+}
+#backToTop.show{opacity:1;pointer-events:auto;transform:translateY(0);}
+#backToTop:hover{border-color:var(--gold);color:var(--gold);}
+
+/* misc lab items */
+.sentence-lab{
+  font-family:var(--font-body);font-size:1rem;line-height:2;color:var(--text);
+}
+.sentence-lab abbr{cursor:help;text-decoration-color:var(--text-faint);}
+
+.editable-box{
+  background:var(--bg-deep);border:1px solid var(--border);border-radius:8px;
+  padding:12px;font-size:.88rem;min-height:60px;
+}
+.editable-box:focus{outline:2px solid var(--teal);outline-offset:2px;}
+.dragzone-row{display:flex;gap:10px;}
+.drag-item,.drop-target{
+  border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.82rem;text-align:center;
+}
+.drag-item{background:var(--surface-2);cursor:grab;color:var(--gold);font-family:var(--font-mono);}
+.drop-target{flex:1;background:var(--bg-deep);border-style:dashed;color:var(--text-faint);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.drop-target.over{border-color:var(--teal);color:var(--teal);background:var(--teal-soft);}
+.tab-order-row{display:flex;gap:10px;}
+.tab-order-row .box{
+  flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;
+  padding:14px;text-align:center;font-family:var(--font-mono);font-size:.82rem;color:var(--text-dim);
+}
+.tab-order-row .box:focus{background:var(--gold-soft);border-color:var(--gold);color:var(--gold);}
+
+.placeholder-img{
+  border-radius:var(--radius-md);border:1px solid var(--border);
+  background:
+    repeating-linear-gradient(135deg, var(--surface-2) 0 10px, var(--surface) 10px 20px);
+  display:flex;align-items:center;justify-content:center;color:var(--text-faint);
+  font-family:var(--font-mono);font-size:.72rem;text-align:center;padding:20px;min-height:110px;
+}
+
+.canvas-wrap canvas{border-radius:8px;background:var(--bg-deep);border:1px solid var(--border);display:block;width:100%;height:auto;}
+
+footer.site-footer{
+  max-width:70ch;margin:20px 0 0;padding:36px 0 10px;color:var(--text-faint);font-size:.88rem;
+  border-top:1px solid var(--border-soft);
+}
+footer.site-footer code{font-family:var(--font-mono);color:var(--text-dim);}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:900px){
+  .menu-toggle{display:flex;}
+  .sidebar{
+    position:fixed;top:var(--topbar-h);left:0;bottom:0;z-index:180;
+    background:var(--bg);width:82vw;max-width:320px;
+    transform:translateX(-100%);transition:transform .25s var(--ease);
+    border-right:1px solid var(--border);
+  }
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay{
+    display:none;position:fixed;inset:var(--topbar-h) 0 0 0;background:rgba(0,0,0,.5);z-index:170;
+  }
+  .sidebar-overlay.show{display:block;}
+  .search-wrap{max-width:none;}
+  .brand small{display:none;}
+}
+@media (max-width:560px){
+  .hero-stats{gap:20px;}
+  .field-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div id="progressBar"></div>
+
+<header class="topbar">
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle section menu" aria-expanded="false">☰</button>
+  <div class="brand"><span class="bracket">&lt;/&gt;</span> HTML5 Field Guide<span class="dot">.</span>
+    <small>Interactive reference</small>
+  </div>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="searchInput" type="search" placeholder="Find a tag or attribute…" autocomplete="off" aria-label="Search the handbook">
+    <span class="search-count" id="searchCount"></span>
+    <div class="search-nav">
+      <button id="prevMatch" aria-label="Previous match" disabled>↑</button>
+      <button id="nextMatch" aria-label="Next match" disabled>↓</button>
+    </div>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-label">On this page</div>
+    <nav id="sideNav">
+      <a href="#sec-1"><span class="n">01</span>The Boilerplate</a>
+      <a href="#sec-2"><span class="n">02</span>Document Metadata</a>
+      <a href="#sec-3"><span class="n">03</span>Sectioning &amp; Structure</a>
+      <a href="#sec-4"><span class="n">04</span>Text Content</a>
+      <a href="#sec-5"><span class="n">05</span>Inline Text Semantics</a>
+      <a href="#sec-6"><span class="n">06</span>Links</a>
+      <a href="#sec-7"><span class="n">07</span>Images &amp; Responsive Media</a>
+      <a href="#sec-8"><span class="n">08</span>Audio, Video &amp; Embeds</a>
+      <a href="#sec-9"><span class="n">09</span>Tables</a>
+      <a href="#sec-10"><span class="n">10</span>Forms</a>
+      <a href="#sec-11"><span class="n">11</span>Interactive Elements</a>
+      <a href="#sec-12"><span class="n">12</span>Global Attributes</a>
+      <a href="#sec-13"><span class="n">13</span>Accessibility</a>
+      <a href="#sec-14"><span class="n">14</span>Comments &amp; Entities</a>
+      <a href="#sec-15"><span class="n">15</span>Void Elements</a>
+      <a href="#sec-16"><span class="n">16</span>Deprecated Tags</a>
+      <a href="#sec-17"><span class="n">17</span>Decision Cheat Sheet</a>
+    </nav>
+    <button class="wizard-launch" id="openWizard">
+      <span class="ic">🧭</span>
+      <span>Which tag do I need?<small>Interactive finder — built with &lt;dialog&gt;</small></span>
+    </button>
+  </aside>
+
+  <main id="main-content">
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="hero-eyebrow">Field guide · every HTML5 tag that matters</div>
+        <h1>Look up the <em>right</em> tag,<br>not just <em>a</em> tag.</h1>
+        <p class="hero-sub">Organized by what each element is <em>for</em>, not alphabetically. Keep this open in a side tab — search with <code class="inline">/</code>, copy any snippet, and try the interactive bits live before you write a line of your own.</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><b>110</b><span>Tags indexed</span></div>
+          <div class="hero-stat"><b>17</b><span>Sections</span></div>
+          <div class="hero-stat"><b id="demoCount">20+</b><span>Live demos</span></div>
+        </div>
+      </div>
+      <div class="specimen" id="specimen">
+        <div class="specimen-label"><span>Specimen <span id="specimenIndex">01</span> / 10</span><span>field notes</span></div>
+        <div class="specimen-tag" id="specimenTag">&lt;dialog&gt;</div>
+        <div class="specimen-purpose" id="specimenPurpose">A native modal that handles focus-trapping and ships with a styleable backdrop — no JS library required.</div>
+        <div class="specimen-foot">
+          <div class="specimen-dots" id="specimenDots"></div>
+          <button class="specimen-next" id="specimenNext">next specimen →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 1 — BOILERPLATE ============ -->
+    <section class="handbook-section" id="sec-1">
+      <div class="section-head">
+        <span class="section-num">01</span>
+        <div><h2>The Boilerplate</h2>
+        <p class="section-intro">Every HTML document starts here. Memorize what it does, not the characters — you'll never type it from scratch by Week 3.</p></div>
+      </div>
+
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp1"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-html" id="bp1">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;meta name="description" content="A short, honest summary of the page for search engines"&gt;
+  &lt;title&gt;Page Title&lt;/title&gt;
+  &lt;link rel="icon" href="favicon.ico"&gt;
+  &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;!-- your content --&gt;
+
+  &lt;script src="app.js" defer&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      </div>
+
+      <div class="callout"><b>&lt;!DOCTYPE html&gt;</b> — tells the browser "render this in standards mode." Always the first line, no exceptions.</div>
+      <div class="callout"><b>&lt;html lang="en"&gt;</b> — the <code class="inline">lang</code> attribute isn't decoration; screen readers use it to pick pronunciation, and browsers use it for translation prompts.</div>
+      <div class="callout"><b>&lt;script defer&gt;</b> — loads the script in the background and runs it only after the HTML is fully parsed, in order. This is why <code class="inline">&lt;script&gt;</code> used to go right before <code class="inline">&lt;/body&gt;</code> — with <code class="inline">defer</code>, you don't even need to; it can live in <code class="inline">&lt;head&gt;</code>.</div>
+    </section>
+
+    <!-- ============ SECTION 2 — DOCUMENT METADATA ============ -->
+    <section class="handbook-section" id="sec-2">
+      <div class="section-head">
+        <span class="section-num">02</span>
+        <div><h2>Document Metadata</h2>
+        <p class="section-intro">Everything inside <code class="inline">&lt;head&gt;</code> — nothing here renders on the page itself, but all of it matters.</p></div>
+      </div>
+      <div class="entries" id="entries-2">
+        <div class="spec-row"><code class="tag-chip">&lt;head&gt;</code><div class="spec-body"><p class="spec-purpose">Container for metadata — nothing here is visible on the page itself.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;title&gt;</code><div class="spec-body"><p class="spec-purpose">The browser tab text and default bookmark/search-result title — every page needs exactly one.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;meta charset&gt;</code><div class="spec-body"><p class="spec-purpose">Character encoding — always include this, first thing in <code class="inline">&lt;head&gt;</code>.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;meta viewport&gt;</code><div class="spec-body"><p class="spec-purpose">Makes the page render correctly on mobile instead of zoomed-out desktop-style.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;meta description&gt;</code><div class="spec-body"><p class="spec-purpose">The text Google shows under your link in search results.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;link rel="stylesheet"&gt;</code><div class="spec-body"><p class="spec-purpose">Attaches an external CSS file.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;link rel="icon"&gt;</code><div class="spec-body"><p class="spec-purpose">The favicon.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;style&gt;</code><div class="spec-body"><p class="spec-purpose">Inline CSS block — fine for small demos, avoid in real projects. Use external files instead.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;script&gt;</code><div class="spec-body"><p class="spec-purpose">Embeds or links JavaScript. Use <code class="inline">defer</code> (runs after parsing, in order) or <code class="inline">async</code> (runs as soon as loaded, order not guaranteed) — plain <code class="inline">&lt;script&gt;</code> with no attribute blocks HTML parsing until it finishes, which is the thing you're trying to avoid.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;base href&gt;</code><div class="spec-body"><p class="spec-purpose">Sets a default base URL for every relative link on the page — rare, but explains weird link bugs when it's present and you didn't know it.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;noscript&gt;</code><div class="spec-body"><p class="spec-purpose">Fallback content shown only if JavaScript is disabled. (You're reading its output right now, at the bottom of this page, if JS is off.)</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 3 — SECTIONING & SEMANTIC STRUCTURE ============ -->
+    <section class="handbook-section" id="sec-3">
+      <div class="section-head">
+        <span class="section-num">03</span>
+        <div><h2>Sectioning &amp; Semantic Structure</h2>
+        <p class="section-intro">This is the part most beginners get sloppy on — and the part that actually matters for accessibility and SEO. Rule of thumb: <b style="color:var(--text)">reach for a semantic tag first; only fall back to <code class="inline">&lt;div&gt;</code> when nothing else fits.</b></p></div>
+      </div>
+      <div class="entries" id="entries-3">
+        <div class="spec-row"><code class="tag-chip">&lt;body&gt;</code><div class="spec-body"><p class="spec-purpose">Everything visible on the page.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;header&gt;</code><div class="spec-body"><p class="spec-purpose">Introductory content — a logo, nav, page heading. Can appear once per page <i>or</i> once per <code class="inline">&lt;article&gt;</code>/<code class="inline">&lt;section&gt;</code>.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;nav&gt;</code><div class="spec-body"><p class="spec-purpose">A block of primary navigation links — not every group of links needs one.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;main&gt;</code><div class="spec-body"><p class="spec-purpose">The one central, unique content of the page — <b style="color:var(--text)">exactly one per page.</b></p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;article&gt;</code><div class="spec-body"><p class="spec-purpose">Self-contained content that would make sense distributed on its own — a blog post, a product card, a comment.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;section&gt;</code><div class="spec-body"><p class="spec-purpose">A thematic grouping of content, usually with its own heading — used when <code class="inline">&lt;article&gt;</code> is too specific but <code class="inline">&lt;div&gt;</code> is too meaningless.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;aside&gt;</code><div class="spec-body"><p class="spec-purpose">Content tangentially related to the main content — a sidebar, a pull quote, related links.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;footer&gt;</code><div class="spec-body"><p class="spec-purpose">Closing content — copyright, contact info, site links.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;h1&gt;–&lt;h6&gt;</code><div class="spec-body"><p class="spec-purpose">Headings, in strict order of importance. Don't skip levels (h2 straight to h4) — screen reader users navigate by heading structure.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;hgroup&gt;</code><div class="spec-body"><p class="spec-purpose">Groups a heading with its subheading so assistive tech treats them as one unit.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;address&gt;</code><div class="spec-body"><p class="spec-purpose">Contact information for the page/article author — has real semantic meaning, not just a styling hook.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;div&gt;</code><div class="spec-body"><p class="spec-purpose">A generic block container with <b style="color:var(--text)">no semantic meaning</b> — the fallback when nothing above fits, not the default.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;search&gt;</code><div class="spec-body"><p class="spec-purpose">A newer (2024+) landmark for wrapping search/filter functionality — genuinely worth using over a bare <code class="inline">&lt;div class="search"&gt;</code>.</p></div></div>
+      </div>
+
+      <div class="subhead">The skeleton in practice</div>
+      <div class="demo">
+        <div class="code-panel">
+          <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp3"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-html" id="bp3">&lt;body&gt;
+  &lt;header&gt;
+    &lt;nav&gt;&lt;!-- site links --&gt;&lt;/nav&gt;
+  &lt;/header&gt;
+
+  &lt;main&gt;
+    &lt;article&gt;
+      &lt;header&gt;&lt;h1&gt;Post Title&lt;/h1&gt;&lt;/header&gt;
+      &lt;p&gt;Content...&lt;/p&gt;
+    &lt;/article&gt;
+    &lt;aside&gt;Related posts&lt;/aside&gt;
+  &lt;/main&gt;
+
+  &lt;footer&gt;&amp;copy; 2026&lt;/footer&gt;
+&lt;/body&gt;</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Structure, mapped</div>
+          <div class="wireframe">
+            <div class="wf-box"><span class="wf-tag">header</span> → <span class="wf-tag">nav</span></div>
+            <div class="wf-box"><span class="wf-tag">main</span>
+              <div class="wf-row" style="margin-top:8px;">
+                <div class="wf-box"><span class="wf-tag">article</span> → header + h1 + p</div>
+                <div class="wf-box"><span class="wf-tag">aside</span> → related posts</div>
+              </div>
+            </div>
+            <div class="wf-box"><span class="wf-tag">footer</span> → © 2026</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 4 — TEXT CONTENT ============ -->
+    <section class="handbook-section" id="sec-4">
+      <div class="section-head">
+        <span class="section-num">04</span>
+        <div><h2>Text Content</h2>
+        <p class="section-intro">The block-level building blocks of a page's prose.</p></div>
+      </div>
+      <div class="entries" id="entries-4">
+        <div class="spec-row"><code class="tag-chip">&lt;p&gt;</code><div class="spec-body"><p class="spec-purpose">A paragraph.</p><p class="spec-example">&lt;p&gt;Text.&lt;/p&gt;</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;hr&gt;</code><div class="spec-body"><p class="spec-purpose">A thematic break between content — not just a decorative line.</p><p class="spec-example">&lt;hr&gt;</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;pre&gt;</code><div class="spec-body"><p class="spec-purpose">Preformatted text — preserves whitespace/line breaks exactly as written.</p><p class="spec-example">&lt;pre&gt;  spaced   text&lt;/pre&gt;</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;blockquote&gt;</code><div class="spec-body"><p class="spec-purpose">A block-level quotation from another source.</p><p class="spec-example">&lt;blockquote cite="url"&gt;Quoted text.&lt;/blockquote&gt;</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;ol&gt; / &lt;li&gt;</code><div class="spec-body"><p class="spec-purpose">Ordered (numbered) list.</p><p class="spec-example">&lt;ol&gt;&lt;li&gt;First&lt;/li&gt;&lt;/ol&gt;</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;ul&gt; / &lt;li&gt;</code><div class="spec-body"><p class="spec-purpose">Unordered (bulleted) list.</p><p class="spec-example">&lt;ul&gt;&lt;li&gt;Item&lt;/li&gt;&lt;/ul&gt;</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;dl&gt; &lt;dt&gt; &lt;dd&gt;</code><div class="spec-body"><p class="spec-purpose">Description list — a term paired with its description.</p><p class="spec-note">See the live example below.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;figure&gt; &lt;figcaption&gt;</code><div class="spec-body"><p class="spec-purpose">Self-contained media (usually an image) with an optional caption.</p><p class="spec-note">See the live example below.</p></div></div>
+      </div>
+
+      <div class="demo">
+        <div class="code-panel">
+          <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp4"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-html" id="bp4">&lt;dl&gt;
+  &lt;dt&gt;HTML&lt;/dt&gt;
+  &lt;dd&gt;The markup language that structures web content.&lt;/dd&gt;
+&lt;/dl&gt;
+
+&lt;figure&gt;
+  &lt;img src="chart.png" alt="Bar chart of Q1 revenue by region"&gt;
+  &lt;figcaption&gt;Fig. 1 — Q1 revenue by region&lt;/figcaption&gt;
+&lt;/figure&gt;</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live</div>
+          <div class="live-stage stack">
+            <dl style="margin:0;">
+              <dt style="font-weight:600;">HTML</dt>
+              <dd style="margin:2px 0 10px;color:var(--text-dim);">The markup language that structures web content.</dd>
+            </dl>
+            <figure style="margin:0;">
+              <div class="placeholder-img">▁▃▅▇▅▃▁<br>chart.png (placeholder)</div>
+              <figcaption style="font-size:.78rem;color:var(--text-faint);margin-top:6px;">Fig. 1 — Q1 revenue by region</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 5 — INLINE TEXT SEMANTICS ============ -->
+    <section class="handbook-section" id="sec-5">
+      <div class="section-head">
+        <span class="section-num">05</span>
+        <div><h2>Inline Text Semantics</h2>
+        <p class="section-intro">These live <i>inside</i> a line of text. The distinction beginners miss: several of these look identical to CSS styling but carry real meaning — screen readers announce them differently, and search engines weight them differently.</p></div>
+      </div>
+      <div class="entries" id="entries-5">
+        <div class="spec-row"><code class="tag-chip">&lt;a&gt;</code><div class="spec-body"><p class="spec-purpose">A hyperlink.</p><p class="spec-note">Big enough to deserve its own section — see §06 below.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;strong&gt;</code><div class="spec-body"><p class="spec-purpose">Strong importance.</p><p class="spec-note">Renders bold — but the meaning, not the bold, is the point.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;em&gt;</code><div class="spec-body"><p class="spec-purpose">Stress emphasis (changes meaning when spoken aloud).</p><p class="spec-note">Renders italic, same distinction as <code class="inline">&lt;strong&gt;</code>.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;b&gt;</code><div class="spec-body"><p class="spec-purpose">Draws attention without extra importance — product names, keywords.</p><p class="spec-note">Use <code class="inline">&lt;strong&gt;</code> if it's actually important.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;i&gt;</code><div class="spec-body"><p class="spec-purpose">An alternate voice/mood — technical terms, taxonomic names, foreign phrases.</p><p class="spec-note">Use <code class="inline">&lt;em&gt;</code> if it's actually emphasis.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;u&gt;</code><div class="spec-body"><p class="spec-purpose">An unarticulated annotation — e.g. flagging a misspelling.</p><p class="spec-note">Rarely what you want: underline visually implies "link," so don't use this just to underline text for style.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;small&gt;</code><div class="spec-body"><p class="spec-purpose">Side comments, fine print, disclaimers.</p><p class="spec-note">Not just "smaller text" — has legal/print connotation.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;s&gt;</code><div class="spec-body"><p class="spec-purpose">Content that is no longer accurate or relevant — a struck-through price.</p><p class="spec-note">Different from the old <code class="inline">&lt;strike&gt;</code> tag, which is deprecated.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;mark&gt;</code><div class="spec-body"><p class="spec-purpose">Highlighted text relevant to the current context — like a search-term highlight.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;cite&gt;</code><div class="spec-body"><p class="spec-purpose">The title of a creative work — a book, article, song.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;q&gt;</code><div class="spec-body"><p class="spec-purpose">A short inline quotation — browsers add quote marks automatically.</p><p class="spec-note">Use <code class="inline">&lt;blockquote&gt;</code> for longer, block-level quotes.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;dfn&gt;</code><div class="spec-body"><p class="spec-purpose">Marks the defining instance of a term.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;abbr&gt;</code><div class="spec-body"><p class="spec-purpose">An abbreviation — use the <code class="inline">title</code> attribute for the full form.</p><p class="spec-example">&lt;abbr title="Cascading Style Sheets"&gt;CSS&lt;/abbr&gt;</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;time&gt;</code><div class="spec-body"><p class="spec-purpose">A machine-readable date/time via the <code class="inline">datetime</code> attribute.</p><p class="spec-example">&lt;time datetime="2026-07-02"&gt;July 2, 2026&lt;/time&gt;</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;data&gt;</code><div class="spec-body"><p class="spec-purpose">A machine-readable value via the <code class="inline">value</code> attribute.</p><p class="spec-example">&lt;data value="128"&gt;One-Twenty-Eight&lt;/data&gt;</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;code&gt;</code><div class="spec-body"><p class="spec-purpose">A snippet of computer code.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;var&gt;</code><div class="spec-body"><p class="spec-purpose">A variable name — math or programming context.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;samp&gt;</code><div class="spec-body"><p class="spec-purpose">Sample output from a program.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;kbd&gt;</code><div class="spec-body"><p class="spec-purpose">Keyboard input the user should type.</p><p class="spec-example">Press &lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;S&lt;/kbd&gt;</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;sub&gt; / &lt;sup&gt;</code><div class="spec-body"><p class="spec-purpose">Subscript / superscript.</p><p class="spec-example">H&lt;sub&gt;2&lt;/sub&gt;O</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;ruby&gt; &lt;rt&gt; &lt;rp&gt;</code><div class="spec-body"><p class="spec-purpose">Pronunciation annotations for East Asian typography.</p><p class="spec-note">Niche, but real.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;bdi&gt; / &lt;bdo&gt;</code><div class="spec-body"><p class="spec-purpose">Isolate or override text direction, for mixed LTR/RTL content.</p><p class="spec-note">Niche, but real.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;span&gt;</code><div class="spec-body"><p class="spec-purpose">A generic inline container with <b style="color:var(--text)">no semantic meaning</b> — the inline equivalent of <code class="inline">&lt;div&gt;</code>.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;br&gt;</code><div class="spec-body"><p class="spec-purpose">A line break <i>within</i> content — a poem line, a mailing address.</p><p class="spec-note">Never use it to fake vertical spacing — that's CSS's job.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;wbr&gt;</code><div class="spec-body"><p class="spec-purpose">A suggested word-break point in a long unbreakable string — URLs, long words.</p></div></div>
+      </div>
+
+      <div class="subhead">Sentence lab — all of these, live</div>
+      <div class="live-panel">
+        <div class="live-label">Live</div>
+        <p class="sentence-lab">Water is <mark>H<sub>2</sub>O</mark> — that's not exactly <abbr title="General Knowledge">GK</abbr> trivia, it's basic chemistry. The old price was <s>₹499</s>, now ₹399. Save your file with <kbd>Ctrl</kbd>+<kbd>S</kbd> before <time datetime="2026-07-04">July 4, 2026</time>, and note the build number is <data value="128">One-Twenty-Eight</data>.</p>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 6 — LINKS ============ -->
+    <section class="handbook-section" id="sec-6">
+      <div class="section-head">
+        <span class="section-num">06</span>
+        <div><h2>Links — &lt;a&gt; Deep Dive</h2>
+        <p class="section-intro">One tag, five very different behaviors depending on the <code class="inline">href</code>.</p></div>
+      </div>
+
+      <div class="demo">
+        <div class="code-panel">
+          <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp6"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-html" id="bp6">&lt;a href="/about"&gt;Relative link — same site&lt;/a&gt;
+&lt;a href="https://example.com"&gt;Absolute link — external site&lt;/a&gt;
+&lt;a href="#section-2"&gt;Anchor link — jumps to id="section-2"&lt;/a&gt;
+&lt;a href="mailto:hello@example.com"&gt;Opens the user's email client&lt;/a&gt;
+&lt;a href="tel:+911234567890"&gt;Opens the phone dialer (mobile)&lt;/a&gt;
+&lt;a href="https://example.com" target="_blank" rel="noopener noreferrer"&gt;
+  Opens in a new tab, safely
+&lt;/a&gt;</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — these actually work</div>
+          <div class="live-stage stack">
+            <a href="#sec-9" style="color:var(--teal);">↳ Anchor link — jumps to the Tables section</a>
+            <a href="mailto:hello@example.com" style="color:var(--teal);">✉ mailto: — opens your email client</a>
+            <a href="tel:+911234567890" style="color:var(--teal);">☎ tel: — opens the phone dialer</a>
+            <a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank" rel="noopener noreferrer" style="color:var(--teal);">↗ External, opens safely in a new tab</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn"><b>target="_blank"</b> always pair with <b>rel="noopener noreferrer"</b> — without it, the new tab gets partial access back to your original page's <code class="inline">window</code> object. That's a real, documented security issue, not just paranoia.</div>
+      <div class="callout"><code class="inline">rel="nofollow"</code> tells search engines not to pass ranking credit through the link — used for user-submitted or sponsored links.</div>
+    </section>
+
+    <!-- ============ SECTION 7 — IMAGES & RESPONSIVE MEDIA ============ -->
+    <section class="handbook-section" id="sec-7">
+      <div class="section-head">
+        <span class="section-num">07</span>
+        <div><h2>Images &amp; Responsive Media</h2>
+        <p class="section-intro">One image tag, plus the machinery for serving the right version to the right screen.</p></div>
+      </div>
+
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp7"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-html" id="bp7">&lt;img src="photo.jpg" alt="A golden retriever running on a beach" width="800" height="600" loading="lazy"&gt;</code></pre>
+      </div>
+      <div class="callout danger"><code class="inline">alt</code> is <b>not optional.</b> Meaningful image → describe it. Purely decorative image → <code class="inline">alt=""</code> (empty, not missing) so screen readers skip it silently.</div>
+      <div class="callout"><code class="inline">width</code>/<code class="inline">height</code> reserve the space before the image loads, preventing the page from jumping around as images pop in — a real Core Web Vitals metric.</div>
+      <div class="callout"><code class="inline">loading="lazy"</code> defers off-screen images until the user scrolls near them.</div>
+
+      <div class="subhead">Responsive / art-directed images</div>
+      <p class="section-intro" style="margin-bottom:10px;">Serve a different image per screen size or format:</p>
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp7b"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-html" id="bp7b">&lt;picture&gt;
+  &lt;source media="(min-width: 800px)"
+          srcset="hero-desktop.webp" type="image/webp"&gt;
+  &lt;source media="(min-width: 800px)"
+          srcset="hero-desktop.jpg"&gt;
+  &lt;img src="hero-mobile.jpg" alt="Description"&gt;
+&lt;/picture&gt;</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">How the browser decides</div>
+          <div class="live-stage stack">
+            <div class="wireframe"><b style="color:var(--teal);">≥ 800px viewport</b><br>→ tries <code class="inline">hero-desktop.webp</code>, falls back to <code class="inline">.jpg</code></div>
+            <div class="wireframe"><b style="color:var(--coral);">&lt; 800px viewport</b><br>→ falls through to the plain <code class="inline">&lt;img&gt;</code>, <code class="inline">hero-mobile.jpg</code></div>
+          </div>
+        </div>
+      </div>
+      <div class="entries" style="margin-top:6px;">
+        <div class="spec-row"><code class="tag-chip">&lt;map&gt; / &lt;area&gt;</code><div class="spec-body"><p class="spec-purpose">Clickable regions inside a single image — rare today, but you'll see it in older codebases.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 8 — AUDIO, VIDEO & EMBEDDED CONTENT ============ -->
+    <section class="handbook-section" id="sec-8">
+      <div class="section-head">
+        <span class="section-num">08</span>
+        <div><h2>Audio, Video &amp; Embedded Content</h2>
+        <p class="section-intro">Media playback and ways to embed content that isn't yours.</p></div>
+      </div>
+
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp8"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-html" id="bp8">&lt;video controls width="640" poster="thumbnail.jpg"&gt;
+  &lt;source src="movie.webm" type="video/webm"&gt;
+  &lt;source src="movie.mp4" type="video/mp4"&gt;
+  &lt;track kind="subtitles" src="subs-en.vtt" srclang="en" label="English"&gt;
+  Your browser doesn't support video.
+&lt;/video&gt;
+
+&lt;audio controls&gt;
+  &lt;source src="song.mp3" type="audio/mpeg"&gt;
+&lt;/audio&gt;</code></pre>
+      </div>
+      <div class="callout">Multiple <code class="inline">&lt;source&gt;</code> children let the browser pick the first format it supports.</div>
+      <div class="callout"><code class="inline">&lt;track&gt;</code> adds captions/subtitles — don't skip this, it's an accessibility requirement, not a nice-to-have.</div>
+      <div class="callout warn">Autoplay video must also be <code class="inline">muted</code> or most browsers will silently block it anyway.</div>
+
+      <div class="entries" id="entries-8">
+        <div class="spec-row"><code class="tag-chip">&lt;iframe&gt;</code><div class="spec-body"><p class="spec-purpose">Embeds another page/document — always give it a <code class="inline">title</code> attribute for accessibility.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;embed&gt;</code><div class="spec-body"><p class="spec-purpose">Embeds external content via a plugin (PDFs, etc.) — increasingly rare.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;object&gt;</code><div class="spec-body"><p class="spec-purpose">Similar to <code class="inline">&lt;embed&gt;</code>, more general-purpose.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;canvas&gt;</code><div class="spec-body"><p class="spec-purpose">A blank drawing surface controlled entirely via JavaScript.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;svg&gt;</code><div class="spec-body"><p class="spec-purpose">Scalable vector graphics — can be written directly inline in HTML.</p></div></div>
+      </div>
+
+      <div class="subhead">Three of these, live</div>
+      <div class="live-panel" style="margin-bottom:14px;">
+        <div class="live-label">Live — &lt;iframe&gt; with srcdoc</div>
+        <iframe title="Minimal embedded document example" srcdoc="&lt;body style=&quot;margin:0;font-family:sans-serif;background:%23191c25;color:%23eceef4;display:flex;align-items:center;justify-content:center;height:100%;font-size:13px;&quot;&gt;I'm a separate document, embedded.&lt;/body&gt;" style="width:100%;height:70px;border:1px solid var(--border);border-radius:8px;"></iframe>
+      </div>
+      <div class="demo">
+        <div class="live-panel canvas-wrap">
+          <div class="live-label">Live — &lt;canvas&gt;, drawn by JS</div>
+          <canvas id="canvasDemo" width="500" height="120"></canvas>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — inline &lt;svg&gt;</div>
+          <div class="live-stage" style="justify-content:center;">
+            <svg width="140" height="100" viewBox="0 0 140 100">
+              <polygon points="70,10 130,90 10,90" fill="none" stroke="#f2b84b" stroke-width="3"/>
+              <circle cx="70" cy="60" r="18" fill="#7fd8c4" opacity="0.85"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 9 — TABLES ============ -->
+    <section class="handbook-section" id="sec-9">
+      <div class="section-head">
+        <span class="section-num">09</span>
+        <div><h2>Tables — Full Structure</h2>
+        <p class="section-intro">Tables are for <b style="color:var(--text)">tabular data only</b> — never for page layout. That was a widespread mistake in the late-1990s/2000s web, and it's exactly the kind of outdated pattern this whole guide steers you away from.</p></div>
+      </div>
+
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp9"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-html" id="bp9">&lt;table&gt;
+  &lt;caption&gt;Q1 2026 Revenue by Region&lt;/caption&gt;
+  &lt;colgroup&gt;
+    &lt;col style="background-color: #f5f5f5"&gt;
+    &lt;col span="2"&gt;
+  &lt;/colgroup&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th scope="col"&gt;Region&lt;/th&gt;
+      &lt;th scope="col"&gt;Revenue&lt;/th&gt;
+      &lt;th scope="col"&gt;Growth&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th scope="row"&gt;North&lt;/th&gt;
+      &lt;td&gt;₹12L&lt;/td&gt;
+      &lt;td&gt;+8%&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tfoot&gt;
+    &lt;tr&gt;
+      &lt;th scope="row"&gt;Total&lt;/th&gt;
+      &lt;td&gt;₹12L&lt;/td&gt;
+      &lt;td&gt;+8%&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tfoot&gt;
+&lt;/table&gt;</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live</div>
+          <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
+            <caption style="text-align:left;color:var(--text-faint);font-size:.76rem;margin-bottom:8px;caption-side:top;">Q1 2026 Revenue by Region</caption>
+            <thead><tr style="border-bottom:1px solid var(--border);">
+              <th scope="col" style="text-align:left;padding:7px 4px;color:var(--gold);">Region</th>
+              <th scope="col" style="text-align:left;padding:7px 4px;color:var(--gold);">Revenue</th>
+              <th scope="col" style="text-align:left;padding:7px 4px;color:var(--gold);">Growth</th>
+            </tr></thead>
+            <tbody><tr style="border-bottom:1px solid var(--border-soft);">
+              <th scope="row" style="text-align:left;padding:7px 4px;font-weight:600;">North</th>
+              <td style="padding:7px 4px;">₹12L</td><td style="padding:7px 4px;color:var(--lime);">+8%</td>
+            </tr></tbody>
+            <tfoot><tr>
+              <th scope="row" style="text-align:left;padding:7px 4px;">Total</th>
+              <td style="padding:7px 4px;">₹12L</td><td style="padding:7px 4px;color:var(--lime);">+8%</td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="callout"><code class="inline">scope="col"</code>/<code class="inline">scope="row"</code> on <code class="inline">&lt;th&gt;</code> tells screen readers which header applies to which cell — small addition, real accessibility impact.</div>
+      <div class="callout"><code class="inline">&lt;caption&gt;</code> is the table's accessible title — better than a floating <code class="inline">&lt;p&gt;</code> above it.</div>
+    </section>
+
+    <!-- ============ SECTION 10 — FORMS ============ -->
+    <section class="handbook-section" id="sec-10">
+      <div class="section-head">
+        <span class="section-num">10</span>
+        <div><h2>Forms — The Big One</h2>
+        <p class="section-intro">The most attribute-heavy corner of HTML, and the one that talks directly to your backend.</p></div>
+      </div>
+
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp10"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-html" id="bp10">&lt;form action="/submit" method="post" novalidate&gt;
+
+  &lt;fieldset&gt;
+    &lt;legend&gt;Account Details&lt;/legend&gt;
+
+    &lt;label for="email"&gt;Email&lt;/label&gt;
+    &lt;input type="email" id="email" name="email" required autocomplete="email"&gt;
+
+    &lt;label for="password"&gt;Password&lt;/label&gt;
+    &lt;input type="password" id="password" name="password" minlength="8" required&gt;
+  &lt;/fieldset&gt;
+
+  &lt;fieldset&gt;
+    &lt;legend&gt;Plan&lt;/legend&gt;
+    &lt;label&gt;&lt;input type="radio" name="plan" value="free"&gt; Free&lt;/label&gt;
+    &lt;label&gt;&lt;input type="radio" name="plan" value="pro"&gt; Pro&lt;/label&gt;
+  &lt;/fieldset&gt;
+
+  &lt;label for="bio"&gt;Bio&lt;/label&gt;
+  &lt;textarea id="bio" name="bio" rows="4"&gt;&lt;/textarea&gt;
+
+  &lt;button type="submit"&gt;Create Account&lt;/button&gt;
+  &lt;button type="reset"&gt;Clear&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+      </div>
+
+      <div class="callout danger"><b>Non-negotiable rule:</b> every <code class="inline">&lt;input&gt;</code> needs an associated <code class="inline">&lt;label&gt;</code> — either via matching <code class="inline">for</code>/<code class="inline">id</code>, or by wrapping the input. This isn't optional politeness; it's what lets a screen reader announce the field's purpose, and it's also what makes clicking the label text focus the input.</div>
+
+      <div class="subhead">Try the real thing</div>
+      <div class="live-panel">
+        <div class="live-label">Live — intercepted on submit, nothing is sent anywhere</div>
+        <form id="demoForm" novalidate>
+          <div class="field-grid">
+            <div class="field"><label for="demoEmail">Email</label><input type="email" id="demoEmail" name="email" required autocomplete="email" placeholder="you@example.com"></div>
+            <div class="field"><label for="demoPassword">Password</label><input type="password" id="demoPassword" name="password" minlength="8" required placeholder="min. 8 characters"></div>
+          </div>
+          <fieldset style="margin:14px 0;border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+            <legend style="font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);padding:0 6px;">Plan</legend>
+            <label style="font-size:.86rem;margin-right:16px;"><input type="radio" name="demoPlan" value="free" checked> Free</label>
+            <label style="font-size:.86rem;"><input type="radio" name="demoPlan" value="pro"> Pro</label>
+          </fieldset>
+          <div class="field" style="margin-bottom:14px;"><label for="demoBio">Bio</label><textarea id="demoBio" rows="2" placeholder="A sentence about you"></textarea></div>
+          <div style="display:flex;gap:10px;">
+            <button type="submit" class="btn primary">Create Account</button>
+            <button type="reset" class="btn">Clear</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="subhead">&lt;input&gt; types — one element, wildly different behavior</div>
+      <div class="type-showcase">
+        <div class="field"><label>text</label><input type="text" placeholder="Free text"></div>
+        <div class="field"><label>email</label><input type="email" placeholder="you@mail.com"></div>
+        <div class="field"><label>password</label><input type="password" placeholder="Masked"></div>
+        <div class="field"><label>number</label><input type="number" min="0" max="10" placeholder="0–10"></div>
+        <div class="field"><label>tel</label><input type="tel" placeholder="Phone"></div>
+        <div class="field"><label>url</label><input type="url" placeholder="https://"></div>
+        <div class="field"><label>search</label><input type="search" placeholder="Search…"></div>
+        <div class="field"><label>date</label><input type="date"></div>
+        <div class="field"><label>color</label><input type="color" value="#f2b84b" style="height:38px;padding:3px;"></div>
+        <div class="field"><label>range</label><input type="range" id="rangeInput" min="0" max="100" value="40"></div>
+        <div class="field"><label>file</label><input type="file"></div>
+        <div class="field"><label>checkbox / radio</label>
+          <div style="display:flex;gap:14px;align-items:center;height:36px;">
+            <label style="font-size:.85rem;"><input type="checkbox"> check</label>
+            <label style="font-size:.85rem;"><input type="radio" name="rdemo"> radio</label>
+          </div>
+        </div>
+      </div>
+      <p class="section-intro" style="margin-top:4px;"><b style="color:var(--text)">Common attributes:</b> <code class="inline">name</code> (required — the key the value submits under), <code class="inline">value</code>, <code class="inline">placeholder</code> (a hint, never a replacement for <code class="inline">&lt;label&gt;</code>), <code class="inline">required</code>, <code class="inline">disabled</code>, <code class="inline">readonly</code>, <code class="inline">min</code>/<code class="inline">max</code>/<code class="inline">step</code>, <code class="inline">pattern</code> (regex), <code class="inline">maxlength</code>/<code class="inline">minlength</code>, <code class="inline">autocomplete</code>, <code class="inline">autofocus</code>, <code class="inline">multiple</code>.</p>
+
+      <div class="callout warn"><b>The &lt;button&gt; gotcha:</b> inside a <code class="inline">&lt;form&gt;</code>, a <code class="inline">&lt;button&gt;</code> with no <code class="inline">type</code> attribute defaults to <code class="inline">type="submit"</code>. Classic bug: a "cancel" or "toggle" button silently submits the form. Always set <code class="inline">type="button"</code> explicitly unless you actually mean to submit.</div>
+
+      <div class="entries" id="entries-10b">
+        <div class="spec-row"><code class="tag-chip">&lt;select&gt; &lt;option&gt; &lt;optgroup&gt;</code><div class="spec-body"><p class="spec-purpose">Dropdown menu, optionally grouped.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;datalist&gt;</code><div class="spec-body"><p class="spec-purpose">A list of autocomplete suggestions, linked to an input via the <code class="inline">list</code> attribute.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;output&gt;</code><div class="spec-body"><p class="spec-purpose">Displays the result of a calculation — <code class="inline">for</code> links it to the inputs involved.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;progress&gt;</code><div class="spec-body"><p class="spec-purpose">A task's completion progress (<code class="inline">value</code>/<code class="inline">max</code>) — how much is <i>done</i>.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;meter&gt;</code><div class="spec-body"><p class="spec-purpose">A measurement within a known range — a gauge, not a progress bar. Commonly confused with <code class="inline">&lt;progress&gt;</code>: the distinction is completion vs. measurement.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;fieldset&gt; &lt;legend&gt;</code><div class="spec-body"><p class="spec-purpose">Groups related fields with an accessible group label — essential for radio/checkbox groups.</p></div></div>
+      </div>
+
+      <div class="live-panel">
+        <div class="live-label">Live — select / datalist / output / progress / meter</div>
+        <div class="field-grid">
+          <div class="field"><label>select</label>
+            <select><option>Free</option><option>Pro</option><option>Team</option></select>
+          </div>
+          <div class="field"><label>datalist</label>
+            <input list="langs" placeholder="Type a language…">
+            <datalist id="langs"><option value="JavaScript"><option value="TypeScript"><option value="Python"></datalist>
+          </div>
+          <div class="field"><label>range → output (linked live)</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input type="range" id="rangeInput2" min="0" max="100" value="65" style="flex:1;">
+              <output id="rangeOutput" style="font-family:var(--font-mono);color:var(--gold);min-width:34px;">65</output>
+            </div>
+          </div>
+          <div class="field"><label>progress (done) / meter (gauge)</label>
+            <div style="display:flex;gap:12px;align-items:center;">
+              <progress value="70" max="100" style="flex:1;"></progress>
+              <meter value="0.6" min="0" max="1" low="0.3" high="0.8" optimum="0.9" style="flex:1;"></meter>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 11 — INTERACTIVE ELEMENTS ============ -->
+    <section class="handbook-section" id="sec-11">
+      <div class="section-head">
+        <span class="section-num">11</span>
+        <div><h2>Interactive Elements (No JavaScript Required)</h2>
+        <p class="section-intro">Genuine interactivity, shipped natively by the browser.</p></div>
+      </div>
+
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp11"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-html" id="bp11">&lt;details&gt;
+  &lt;summary&gt;Click to expand&lt;/summary&gt;
+  &lt;p&gt;Hidden content, revealed natively — no JS
+     accordion library needed.&lt;/p&gt;
+&lt;/details&gt;
+
+&lt;dialog id="myModal"&gt;
+  &lt;p&gt;A native modal dialog.&lt;/p&gt;
+  &lt;button onclick="myModal.close()"&gt;Close&lt;/button&gt;
+&lt;/dialog&gt;
+&lt;button onclick="myModal.showModal()"&gt;Open Modal&lt;/button&gt;</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live</div>
+          <div class="live-stage stack">
+            <details>
+              <summary style="cursor:pointer;color:var(--teal);font-size:.9rem;">Click to expand</summary>
+              <p style="font-size:.85rem;color:var(--text-dim);margin-top:8px;">Hidden content, revealed natively — no JS accordion library needed.</p>
+            </details>
+            <button class="btn primary" id="openDemoDialog" style="align-self:flex-start;">Open Modal</button>
+          </div>
+        </div>
+      </div>
+      <p class="section-intro"><code class="inline">&lt;dialog&gt;</code> handles focus-trapping and comes with a <code class="inline">::backdrop</code> you can style — genuinely replaces a lot of what people used to reach for a JS modal library to do.</p>
+
+      <div class="subhead">Worth knowing about — genuinely current, not in most older tutorials</div>
+      <p class="section-intro" style="margin-bottom:10px;">The <code class="inline">popover</code> global attribute reached full cross-browser support in April 2025. It turns any element into a native floating overlay — dropdown, toast, tooltip — with automatic top-layer stacking, click-outside dismissal, and <kbd>Esc</kbd>-to-close, all without JavaScript or a library like Popper/Floating UI:</p>
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp11b"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-html" id="bp11b">&lt;button popovertarget="menu"&gt;Open menu&lt;/button&gt;
+&lt;div id="menu" popover&gt;
+  &lt;a href="/profile"&gt;Profile&lt;/a&gt;
+  &lt;a href="/settings"&gt;Settings&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — zero JS</div>
+          <div class="live-stage">
+            <button class="btn" popovertarget="demoMenu">Open menu ▾</button>
+            <div id="demoMenu" popover>
+              <a href="#sec-11">Profile</a>
+              <a href="#sec-11">Settings</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="callout">This is exactly the kind of thing worth using now instead of the older, heavier pattern most tutorials still teach.</div>
+    </section>
+
+    <!-- ============ SECTION 12 — GLOBAL ATTRIBUTES ============ -->
+    <section class="handbook-section" id="sec-12">
+      <div class="section-head">
+        <span class="section-num">12</span>
+        <div><h2>Global Attributes</h2>
+        <p class="section-intro">Work on almost any tag, regardless of what it is.</p></div>
+      </div>
+      <div class="entries" id="entries-12">
+        <div class="spec-row"><code class="tag-chip">id</code><div class="spec-body"><p class="spec-purpose">A unique identifier — used for CSS, JS, <code class="inline">label for=</code>, anchor links.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">class</code><div class="spec-body"><p class="spec-purpose">One or more style/JS hooks, space-separated.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">style</code><div class="spec-body"><p class="spec-purpose">Inline CSS — fine for quick tests, avoid in real projects.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">title</code><div class="spec-body"><p class="spec-purpose">A tooltip shown on hover.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">data-*</code><div class="spec-body"><p class="spec-purpose">Custom data attributes for your own JS to read.</p><p class="spec-example">data-user-id="42"</p></div></div>
+        <div class="spec-row"><code class="tag-chip">tabindex</code><div class="spec-body"><p class="spec-purpose">Controls keyboard focus order — <code class="inline">0</code> inserts into natural tab order, <code class="inline">-1</code> makes it focusable only via JS, positive numbers are almost always a mistake.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">hidden</code><div class="spec-body"><p class="spec-purpose">Hides the element entirely (boolean attribute).</p></div></div>
+        <div class="spec-row"><code class="tag-chip">contenteditable</code><div class="spec-body"><p class="spec-purpose">Makes the element's content directly editable by the user.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">draggable</code><div class="spec-body"><p class="spec-purpose">Enables native drag-and-drop.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">lang</code><div class="spec-body"><p class="spec-purpose">Language of the element's content — affects screen reader pronunciation and translation tools.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">dir</code><div class="spec-body"><p class="spec-purpose">Text direction: <code class="inline">ltr</code>, <code class="inline">rtl</code>, or <code class="inline">auto</code>.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">spellcheck</code><div class="spec-body"><p class="spec-purpose">Toggles the browser's spellcheck on editable content.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">role</code><div class="spec-body"><p class="spec-purpose">An ARIA role — your gateway into accessibility semantics beyond what native tags cover.</p></div></div>
+      </div>
+
+      <div class="subhead">A tiny playground — try all three</div>
+      <div class="live-panel">
+        <div class="live-label">Live</div>
+        <div class="live-stage stack">
+          <div>
+            <label style="font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);display:block;margin-bottom:5px;">contenteditable — click in and type</label>
+            <div class="editable-box" contenteditable="true">Edit me. Really — click here and type.</div>
+          </div>
+          <div>
+            <label style="font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);display:block;margin-bottom:5px;">draggable — drag the chip into the box</label>
+            <div class="dragzone-row">
+              <div class="drag-item" id="dragItem" draggable="true">&lt;div&gt;</div>
+              <div class="drop-target" id="dropTarget">drop zone</div>
+            </div>
+          </div>
+          <div>
+            <label style="font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);display:block;margin-bottom:5px;">tabindex — click box 1, then press Tab twice</label>
+            <div class="tab-order-row">
+              <div class="box" tabindex="1">tabindex="1"</div>
+              <div class="box" tabindex="2">tabindex="2"</div>
+              <div class="box" tabindex="3">tabindex="3"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 13 — ACCESSIBILITY ============ -->
+    <section class="handbook-section" id="sec-13">
+      <div class="section-head">
+        <span class="section-num">13</span>
+        <div><h2>Accessibility Essentials</h2>
+        <p class="section-intro">A handful of rules that cost nothing and matter enormously. Click each one off as you internalize it.</p></div>
+      </div>
+      <div class="checklist" id="a11yChecklist">
+        <div class="check-item"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div><p><b>Every meaningful &lt;img&gt; gets a real alt.</b> Purely decorative images get <code class="inline">alt=""</code> — never just omit the attribute.</p></div>
+        <div class="check-item"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div><p><b>Every &lt;input&gt; gets a real &lt;label&gt;.</b> A placeholder is not a label; it disappears the moment someone starts typing.</p></div>
+        <div class="check-item"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div><p><b>Headings go in strict order.</b> Don't skip from h2 to h4 just because it looks smaller — screen reader users navigate a page by jumping between headings, and skipped levels break that mental map.</p></div>
+        <div class="check-item"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div><p><b>Prefer native semantics over ARIA.</b> &lt;button&gt; is already keyboard-accessible and announced correctly; a &lt;div role="button"&gt; requires you to manually replicate all of that. The community's own guideline: "no ARIA is better than bad ARIA."</p></div>
+        <div class="check-item"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div><p><b>aria-label</b> gives an element an accessible name with no visible text (an icon-only close button); <b>aria-labelledby</b> points to another element's id to reuse as the label.</p></div>
+        <div class="check-item"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div><p><b>Every &lt;iframe&gt; gets a title.</b> (Check §08 above — the live iframe demo has one.)</p></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 14 — COMMENTS & ENTITIES ============ -->
+    <section class="handbook-section" id="sec-14">
+      <div class="section-head">
+        <span class="section-num">14</span>
+        <div><h2>Comments &amp; Entities</h2>
+        <p class="section-intro">Invisible annotations, and the characters HTML won't let you type directly.</p></div>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">html</span><button class="copy-btn" data-copy-target="bp14"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-html" id="bp14">&lt;!-- This is a comment — never rendered, visible in page source --&gt;</code></pre>
+      </div>
+      <p class="section-intro" style="margin-bottom:8px;">Common character entities — needed because these characters have special meaning in HTML. Every glyph below is rendered live by your browser, right now:</p>
+      <div class="entity-grid">
+        <div class="entity-cell"><code>&amp;lt;</code><span class="glyph">&lt;</span></div>
+        <div class="entity-cell"><code>&amp;gt;</code><span class="glyph">&gt;</span></div>
+        <div class="entity-cell"><code>&amp;amp;</code><span class="glyph">&amp;</span></div>
+        <div class="entity-cell"><code>&amp;quot;</code><span class="glyph">&quot;</span></div>
+        <div class="entity-cell"><code>&amp;apos;</code><span class="glyph">&apos;</span></div>
+        <div class="entity-cell"><code>&amp;nbsp;</code><span class="glyph">( non-breaking space )</span></div>
+        <div class="entity-cell"><code>&amp;copy;</code><span class="glyph">&copy;</span></div>
+        <div class="entity-cell"><code>&amp;reg;</code><span class="glyph">&reg;</span></div>
+        <div class="entity-cell"><code>&amp;mdash;</code><span class="glyph">&mdash;</span></div>
+        <div class="entity-cell"><code>&amp;hellip;</code><span class="glyph">&hellip;</span></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 15 — VOID ELEMENTS ============ -->
+    <section class="handbook-section" id="sec-15">
+      <div class="section-head">
+        <span class="section-num">15</span>
+        <div><h2>Void Elements</h2>
+        <p class="section-intro">No closing tag, no children — self-contained. Never write <code class="inline">&lt;/br&gt;</code> or wrap content inside them.</p></div>
+      </div>
+      <div class="chip-grid">
+        <span class="el-chip">&lt;area&gt;</span><span class="el-chip">&lt;base&gt;</span><span class="el-chip">&lt;br&gt;</span><span class="el-chip">&lt;col&gt;</span>
+        <span class="el-chip">&lt;embed&gt;</span><span class="el-chip">&lt;hr&gt;</span><span class="el-chip">&lt;img&gt;</span><span class="el-chip">&lt;input&gt;</span>
+        <span class="el-chip">&lt;link&gt;</span><span class="el-chip">&lt;meta&gt;</span><span class="el-chip">&lt;source&gt;</span><span class="el-chip">&lt;track&gt;</span><span class="el-chip">&lt;wbr&gt;</span>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 16 — DEPRECATED ============ -->
+    <section class="handbook-section" id="sec-16">
+      <div class="section-head">
+        <span class="section-num">16</span>
+        <div><h2>⚠️ Deprecated — If You See These in a Tutorial, It's Outdated</h2>
+        <p class="section-intro">Same spirit as avoiding Create React App in the JS world — these tags are a reliable signal a tutorial predates modern HTML. All the styling and layout they used to do belongs to CSS now — that's the whole reason they were retired.</p></div>
+      </div>
+      <div class="chip-grid">
+        <span class="el-chip deprecated">&lt;center&gt;</span>
+        <span class="el-chip deprecated">&lt;font&gt;</span>
+        <span class="el-chip deprecated">&lt;marquee&gt;</span>
+        <span class="el-chip deprecated">&lt;blink&gt;</span>
+        <span class="el-chip deprecated">&lt;frame&gt;</span>
+        <span class="el-chip deprecated">&lt;frameset&gt;</span>
+        <span class="el-chip deprecated">&lt;noframes&gt;</span>
+        <span class="el-chip deprecated">&lt;big&gt;</span>
+        <span class="el-chip deprecated">&lt;strike&gt;<span class="use-instead">use &lt;s&gt;</span></span>
+        <span class="el-chip deprecated">&lt;tt&gt;</span>
+        <span class="el-chip deprecated">&lt;acronym&gt;<span class="use-instead">use &lt;abbr&gt;</span></span>
+        <span class="el-chip deprecated">&lt;applet&gt;</span>
+        <span class="el-chip deprecated">&lt;basefont&gt;</span>
+        <span class="el-chip deprecated">&lt;dir&gt;<span class="use-instead">use &lt;ul&gt;</span></span>
+        <span class="el-chip deprecated">&lt;isindex&gt;</span>
+        <span class="el-chip deprecated">&lt;xmp&gt;</span>
+        <span class="el-chip deprecated">&lt;nobr&gt;</span>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 17 — DECISION CHEAT SHEET ============ -->
+    <section class="handbook-section" id="sec-17">
+      <div class="section-head">
+        <span class="section-num">17</span>
+        <div><h2>Quick Semantic Decision Cheat Sheet</h2>
+        <p class="section-intro">When you're not sure which tag to reach for, walk down this list:</p></div>
+      </div>
+      <div class="entries">
+        <div class="spec-row"><code class="tag-chip">&lt;nav&gt;</code><div class="spec-body"><p class="spec-purpose">Is it the page's single most important navigation block?</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;article&gt;</code><div class="spec-body"><p class="spec-purpose">Is it standalone content that would make sense syndicated on its own — a post, a card, a comment?</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;section&gt;</code><div class="spec-body"><p class="spec-purpose">Is it a thematic chunk with its own heading, but not standalone?</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;aside&gt;</code><div class="spec-body"><p class="spec-purpose">Is it related but tangential — sidebar, pull-quote?</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;header&gt;</code><div class="spec-body"><p class="spec-purpose">Is it intro content at the top of the page or an article?</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;footer&gt;</code><div class="spec-body"><p class="spec-purpose">Is it closing content — copyright, links, contact?</p></div></div>
+        <div class="spec-row"><code class="tag-chip">&lt;div&gt; / &lt;span&gt;</code><div class="spec-body"><p class="spec-purpose">None of the above, and you just need a box to hook CSS/JS onto? <code class="inline">&lt;div&gt;</code> — or <code class="inline">&lt;span&gt;</code> if it's inline.</p></div></div>
+      </div>
+      <div class="callout">If you can name <i>why</i> content belongs together in a sentence — "this is the navigation," "this is a self-contained article" — there's almost always a semantic tag for it. <code class="inline">&lt;div&gt;</code> is the answer only when there genuinely isn't one.</div>
+      <div style="text-align:center;margin-top:24px;">
+        <button class="btn primary" id="openWizard2" style="padding:13px 26px;font-size:.9rem;">🧭 Try the interactive Tag Finder instead</button>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>That's every tag you'll touch in Weeks 1–2 of a modern curriculum, and most of what you'll touch after. Nothing here needs memorizing cold — the goal is knowing this page exists and roughly what's in it, so you reach for it instead of guessing.</p>
+      <p>Converted from a Markdown handbook into a live reference — every table above is real data, every demo above is real, running HTML.</p>
+    </footer>
+  </main>
+</div>
+
+<!-- simple demo dialog -->
+<dialog id="demoDialog">
+  <div class="dialog-body">
+    <h3>A native modal dialog</h3>
+    <p>This is a real <code class="inline">&lt;dialog&gt;</code> element opened with <code class="inline">.showModal()</code>. It traps focus, dims the page behind it via <code class="inline">::backdrop</code>, and closes on <kbd>Esc</kbd> automatically.</p>
+  </div>
+  <div class="dialog-close-row"><button class="btn primary" id="closeDemoDialog">Close</button></div>
+</dialog>
+
+<!-- tag finder wizard dialog -->
+<dialog id="wizardDialog">
+  <div class="wizard-progress" id="wizardProgress"></div>
+  <div class="dialog-body">
+    <h3 style="margin-bottom:2px;">Which tag do I need?</h3>
+    <p style="margin-bottom:0;font-size:.82rem;">Answer honestly, land on the right semantic element.</p>
+    <div id="wizardQuestion">
+      <p class="wizard-q" id="wizardQText"></p>
+      <div class="wizard-actions">
+        <button class="btn" id="wizardNo">No, next question</button>
+        <button class="btn primary" id="wizardYes">Yes, that's it</button>
+      </div>
+    </div>
+    <div class="wizard-result" id="wizardResult">
+      <code class="tag-chip" id="wizardResultTag"></code>
+      <p id="wizardResultText"></p>
+      <div class="wizard-actions" style="margin-top:16px;">
+        <button class="btn primary" id="wizardRestart" style="flex:1;">Start over</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast"><span class="dot"></span><span id="toastText"></span></div>
+<button id="backToTop" aria-label="Back to top">↑</button>
+
+<noscript>
+  <div style="position:fixed;bottom:0;left:0;right:0;background:#1f2330;color:#eceef4;padding:12px 20px;font-family:sans-serif;font-size:.85rem;text-align:center;border-top:1px solid #2b3040;z-index:999;">
+    This reference reads fine without JavaScript — search, copy buttons, and the interactive demos need it, though. All content below still works.
+  </div>
+</noscript>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+  /* ---------- syntax highlighting ---------- */
+  if(window.hljs){ hljs.highlightAll(); } else {
+    window.addEventListener('load', function(){ if(window.hljs) hljs.highlightAll(); });
+  }
+
+  /* ---------- reading progress bar ---------- */
+  var progressBar = document.getElementById('progressBar');
+  function updateProgress(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progressBar.style.width = (scrolled||0) + '%';
+  }
+  document.addEventListener('scroll', updateProgress, {passive:true});
+  updateProgress();
+
+  /* ---------- back to top ---------- */
+  var backToTop = document.getElementById('backToTop');
+  document.addEventListener('scroll', function(){
+    backToTop.classList.toggle('show', window.scrollY > 700);
+  }, {passive:true});
+  backToTop.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+
+  /* ---------- mobile sidebar ---------- */
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+  var menuToggle = document.getElementById('menuToggle');
+  function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('show'); menuToggle.setAttribute('aria-expanded','false'); }
+  function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('show'); menuToggle.setAttribute('aria-expanded','true'); }
+  menuToggle.addEventListener('click', function(){ sidebar.classList.contains('open') ? closeSidebar() : openSidebar(); });
+  overlay.addEventListener('click', closeSidebar);
+  document.getElementById('sideNav').addEventListener('click', function(e){ if(e.target.tagName==='A') closeSidebar(); });
+
+  /* ---------- sidebar scroll-spy ---------- */
+  var navLinks = Array.from(document.querySelectorAll('#sideNav a'));
+  var sections = navLinks.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  var spy = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      var link = navLinks.find(function(a){ return a.getAttribute('href') === '#' + entry.target.id; });
+      if(!link) return;
+      if(entry.isIntersecting){
+        navLinks.forEach(function(a){ a.classList.remove('active'); });
+        link.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-15% 0px -70% 0px'});
+  sections.forEach(function(s){ spy.observe(s); });
+
+  /* ---------- copy buttons ---------- */
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var targetId = btn.getAttribute('data-copy-target');
+      var codeEl = document.getElementById(targetId);
+      if(!codeEl) return;
+      var text = codeEl.textContent;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.classList.add('copied');
+        var label = btn.querySelector('.cb-label');
+        var prev = label.textContent;
+        label.textContent = 'Copied!';
+        setTimeout(function(){ label.textContent = prev; btn.classList.remove('copied'); }, 1500);
+      }).catch(function(){});
+    });
+  });
+
+  /* ---------- toast ---------- */
+  var toast = document.getElementById('toast');
+  var toastText = document.getElementById('toastText');
+  var toastTimer;
+  function showToast(msg){
+    toastText.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2600);
+  }
+
+  /* ---------- demo form intercept ---------- */
+  var demoForm = document.getElementById('demoForm');
+  if(demoForm){
+    demoForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      showToast('Form intercepted — nothing was sent anywhere.');
+    });
+  }
+
+  /* ---------- linked range + output ---------- */
+  var rangeInput2 = document.getElementById('rangeInput2');
+  var rangeOutput = document.getElementById('rangeOutput');
+  if(rangeInput2 && rangeOutput){
+    rangeInput2.addEventListener('input', function(){ rangeOutput.textContent = rangeInput2.value; });
+  }
+
+  /* ---------- demo dialog ---------- */
+  var demoDialog = document.getElementById('demoDialog');
+  var openDemoDialog = document.getElementById('openDemoDialog');
+  if(openDemoDialog){ openDemoDialog.addEventListener('click', function(){ demoDialog.showModal(); }); }
+  var closeDemoDialog = document.getElementById('closeDemoDialog');
+  if(closeDemoDialog){ closeDemoDialog.addEventListener('click', function(){ demoDialog.close(); }); }
+
+  /* ---------- accessibility checklist ---------- */
+  var checklist = document.getElementById('a11yChecklist');
+  if(checklist){
+    checklist.addEventListener('click', function(e){
+      var item = e.target.closest('.check-item');
+      if(item) item.classList.toggle('on');
+    });
+  }
+
+  /* ---------- drag and drop demo ---------- */
+  var dragItem = document.getElementById('dragItem');
+  var dropTarget = document.getElementById('dropTarget');
+  if(dragItem && dropTarget){
+    dragItem.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text/plain','tag'); });
+    dropTarget.addEventListener('dragover', function(e){ e.preventDefault(); dropTarget.classList.add('over'); });
+    dropTarget.addEventListener('dragleave', function(){ dropTarget.classList.remove('over'); });
+    dropTarget.addEventListener('drop', function(e){
+      e.preventDefault();
+      dropTarget.classList.remove('over');
+      dropTarget.textContent = 'dropped ✓';
+      setTimeout(function(){ dropTarget.textContent = 'drop zone'; }, 1800);
+    });
+  }
+
+  /* ---------- canvas demo ---------- */
+  var canvas = document.getElementById('canvasDemo');
+  if(canvas && canvas.getContext){
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    var bars = 28;
+    function draw(t){
+      ctx.clearRect(0,0,w,h);
+      for(var i=0;i<bars;i++){
+        var x = (i/bars) * w;
+        var bw = w/bars - 4;
+        var wave = Math.sin((i*0.5) + t/500) * 0.5 + 0.5;
+        var bh = 12 + wave * (h - 24);
+        var grad = ctx.createLinearGradient(0, h-bh, 0, h);
+        grad.addColorStop(0, '#ff7a85');
+        grad.addColorStop(1, '#f2b84b');
+        ctx.fillStyle = grad;
+        ctx.fillRect(x+2, h-bh, bw, bh);
+      }
+    }
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduceMotion){
+      draw(0);
+    } else {
+      (function loop(t){ draw(t); requestAnimationFrame(loop); })(0);
+    }
+  }
+
+  /* ---------- hero specimen rotator ---------- */
+  var specimens = [
+    ['&lt;dialog&gt;', 'A native modal that handles focus-trapping and ships with a styleable backdrop — no JS library required.'],
+    ['&lt;mark&gt;', 'Highlights text relevant to the current context — the same job a real highlighter pen does on paper.'],
+    ['&lt;wbr&gt;', 'A suggested word-break point inside a long, unbreakable string like a URL. Nobody remembers this exists.'],
+    ['&lt;kbd&gt;', 'Marks up keyboard input the reader should type — renders in a monospace key-cap style by default.'],
+    ['&lt;meter&gt;', 'A gauge within a known range. Everyone confuses it with &lt;progress&gt; — that one measures completion, this measures a value.'],
+    ['&lt;bdi&gt;', 'Isolates a span of text so mixed left-to-right and right-to-left content does not scramble its own layout.'],
+    ['&lt;search&gt;', 'A 2024-era landmark for wrapping search/filter UI — genuinely better than a &lt;div class="search"&gt;.'],
+    ['popover', 'Not a tag — a global attribute that turns any element into a native floating overlay. No Popper.js required since April 2025.'],
+    ['&lt;data&gt;', 'Pairs human-readable text with a machine-readable value via its value attribute — built for scripts, not readers.'],
+    ['&lt;ruby&gt;', 'Adds pronunciation annotations above East Asian text — a tag most Western devs never open, but it is load-bearing elsewhere.']
+  ];
+  var specimenIdx = 0;
+  var specimenTag = document.getElementById('specimenTag');
+  var specimenPurpose = document.getElementById('specimenPurpose');
+  var specimenIndex = document.getElementById('specimenIndex');
+  var specimenEl = document.getElementById('specimen');
+  var specimenDots = document.getElementById('specimenDots');
+  specimens.forEach(function(){
+    var d = document.createElement('span');
+    specimenDots.appendChild(d);
+  });
+  function renderSpecimen(){
+    Array.from(specimenDots.children).forEach(function(d,i){ d.classList.toggle('on', i===specimenIdx); });
+    specimenEl.classList.add('fade');
+    setTimeout(function(){
+      specimenTag.innerHTML = specimens[specimenIdx][0];
+      specimenPurpose.textContent = specimens[specimenIdx][1];
+      specimenIndex.textContent = String(specimenIdx+1).padStart(2,'0');
+      specimenEl.classList.remove('fade');
+    }, 220);
+  }
+  function nextSpecimen(){ specimenIdx = (specimenIdx+1) % specimens.length; renderSpecimen(); }
+  renderSpecimen();
+  document.getElementById('specimenNext').addEventListener('click', function(){ nextSpecimen(); resetSpecimenTimer(); });
+  var specimenTimer;
+  var reduceMotionGlobal = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resetSpecimenTimer(){
+    clearInterval(specimenTimer);
+    if(!reduceMotionGlobal){ specimenTimer = setInterval(nextSpecimen, 4200); }
+  }
+  resetSpecimenTimer();
+
+  /* ---------- search / find-in-page ---------- */
+  var searchInput = document.getElementById('searchInput');
+  var searchCount = document.getElementById('searchCount');
+  var prevMatch = document.getElementById('prevMatch');
+  var nextMatch = document.getElementById('nextMatch');
+  var currentMatches = [];
+  var currentIdx = -1;
+
+  function clearHighlights(){
+    document.querySelectorAll('.is-match,.is-current').forEach(function(el){ el.classList.remove('is-match','is-current'); });
+  }
+  function runSearch(){
+    var q = searchInput.value.trim().toLowerCase().replace(/[<>\/]/g,'');
+    clearHighlights();
+    if(!q){
+      searchCount.textContent = '';
+      currentMatches = []; currentIdx = -1;
+      prevMatch.disabled = true; nextMatch.disabled = true;
+      return;
+    }
+    var candidates = Array.from(document.querySelectorAll('.spec-row, .el-chip, .check-item'));
+    currentMatches = candidates.filter(function(el){ return el.textContent.toLowerCase().indexOf(q) !== -1; });
+    currentMatches.forEach(function(el){ el.classList.add('is-match'); });
+    currentIdx = currentMatches.length ? 0 : -1;
+    updateMatchUI();
+  }
+  function updateMatchUI(){
+    document.querySelectorAll('.is-current').forEach(function(el){ el.classList.remove('is-current'); });
+    if(currentMatches.length){
+      searchCount.textContent = (currentIdx+1) + ' of ' + currentMatches.length;
+      var el = currentMatches[currentIdx];
+      el.classList.add('is-current');
+      el.scrollIntoView({behavior: reduceMotionGlobal ? 'auto' : 'smooth', block:'center'});
+      prevMatch.disabled = false; nextMatch.disabled = false;
+    } else {
+      searchCount.textContent = 'No matches';
+      prevMatch.disabled = true; nextMatch.disabled = true;
+    }
+  }
+  function goNext(){ if(!currentMatches.length) return; currentIdx = (currentIdx+1) % currentMatches.length; updateMatchUI(); }
+  function goPrev(){ if(!currentMatches.length) return; currentIdx = (currentIdx-1+currentMatches.length) % currentMatches.length; updateMatchUI(); }
+
+  searchInput.addEventListener('input', runSearch);
+  searchInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); e.shiftKey ? goPrev() : goNext(); }
+    if(e.key === 'Escape'){ searchInput.value=''; runSearch(); searchInput.blur(); }
+  });
+  nextMatch.addEventListener('click', goNext);
+  prevMatch.addEventListener('click', goPrev);
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === '/' && document.activeElement !== searchInput){
+      e.preventDefault(); searchInput.focus();
+    }
+  });
+
+  /* ---------- tag finder wizard ---------- */
+  var wizardSteps = [
+    {q:"Is it the page's single most important navigation block?", tag:'&lt;nav&gt;', text:'A block of primary navigation links.'},
+    {q:'Is it standalone content that would make sense syndicated on its own — a post, a card, a comment?', tag:'&lt;article&gt;', text:'Self-contained content that stands on its own.'},
+    {q:'Is it a thematic chunk with its own heading, but not standalone?', tag:'&lt;section&gt;', text:"A thematic grouping — used when article is too specific but div is too meaningless."},
+    {q:'Is it related but tangential — a sidebar, a pull-quote?', tag:'&lt;aside&gt;', text:'Content tangentially related to the main content.'},
+    {q:'Is it intro content at the top of the page or an article?', tag:'&lt;header&gt;', text:'Introductory content — a logo, nav, or page heading.'},
+    {q:'Is it closing content — copyright, links, contact?', tag:'&lt;footer&gt;', text:'Closing content for the page or article.'}
+  ];
+  var fallback = {tag:'&lt;div&gt; / &lt;span&gt;', text:"None of the above, and you just need a box to hook CSS/JS onto. Use span instead if it's inline."};
+
+  var wizardDialog = document.getElementById('wizardDialog');
+  var wizardProgress = document.getElementById('wizardProgress');
+  var wizardQText = document.getElementById('wizardQText');
+  var wizardQuestion = document.getElementById('wizardQuestion');
+  var wizardResult = document.getElementById('wizardResult');
+  var wizardResultTag = document.getElementById('wizardResultTag');
+  var wizardResultText = document.getElementById('wizardResultText');
+  var wizardStep = 0;
+
+  wizardSteps.forEach(function(){
+    var s = document.createElement('span');
+    wizardProgress.appendChild(s);
+  });
+
+  function renderWizard(){
+    Array.from(wizardProgress.children).forEach(function(s,i){ s.classList.toggle('done', i < wizardStep); });
+    if(wizardStep >= wizardSteps.length){
+      showWizardResult(fallback);
+      return;
+    }
+    wizardQuestion.style.display = '';
+    wizardResult.classList.remove('show');
+    wizardQText.textContent = wizardSteps[wizardStep].q;
+  }
+  function showWizardResult(result){
+    wizardQuestion.style.display = 'none';
+    wizardResult.classList.add('show');
+    wizardResultTag.innerHTML = result.tag;
+    wizardResultText.textContent = result.text;
+    Array.from(wizardProgress.children).forEach(function(s){ s.classList.add('done'); });
+  }
+  function resetWizard(){ wizardStep = 0; renderWizard(); }
+
+  document.getElementById('wizardYes').addEventListener('click', function(){ showWizardResult(wizardSteps[wizardStep]); });
+  document.getElementById('wizardNo').addEventListener('click', function(){ wizardStep++; renderWizard(); });
+  document.getElementById('wizardRestart').addEventListener('click', resetWizard);
+
+  function openWizard(){ resetWizard(); wizardDialog.showModal(); }
+  document.getElementById('openWizard').addEventListener('click', openWizard);
+  var openWizard2 = document.getElementById('openWizard2');
+  if(openWizard2) openWizard2.addEventListener('click', openWizard);
+
+});
+</script>
+</body>
+</html>
