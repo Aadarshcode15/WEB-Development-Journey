@@ -1,11 +1,13 @@
 h1 {
     text-align: center;
     letter-spacing: 5px;
+    font-family: 'Courier New', Courier, monospace;
 }
 h2 {
     text-align: right;
     text-decoration: aqua underline wavy;
-    font-weight: 900;
+    font-weight: normal;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 p {
     text-align: justify;
