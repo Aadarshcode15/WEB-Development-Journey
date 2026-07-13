@@ -1,0 +1,15 @@
+h1 {
+    text-align: center;
+}
+h2 {
+    text-align: right;
+    text-decoration: aqua underline wavy;
+    font-weight: 900;
+}
+p {
+    text-align: justify;
+    text-decoration: aqua underline wavy;
+}
+a {
+    text-decoration: none;
+}
