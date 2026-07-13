@@ -1,0 +1,2257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="An interactive field guide to modern CSS — cascade, layout, and the 2026 features that replaced Sass and JS positioning libraries — with live, editable demos.">
+<title>The CSS Field Guide — Interactive Reference</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.85em' font-size='75' fill='%237fd8c4'%3E%7B%7D%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --bg:#12141b;
+  --bg-deep:#0d0e13;
+  --surface:#191c25;
+  --surface-2:#1f2330;
+  --surface-3:#262b3a;
+  --border:#2b3040;
+  --border-soft:rgba(255,255,255,.06);
+  --text:#eceef4;
+  --text-dim:#9aa0b6;
+  --text-faint:#5f6579;
+
+  --gold:#f2b84b;
+  --gold-soft:rgba(242,184,75,.14);
+  --coral:#ff7a85;
+  --coral-soft:rgba(255,122,133,.14);
+  --teal:#7fd8c4;
+  --teal-soft:rgba(127,216,196,.14);
+  --lime:#b7d876;
+  --lime-soft:rgba(183,216,118,.14);
+
+  --font-display:'Fraunces',serif;
+  --font-body:'Public Sans',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:18px;
+
+  --topbar-h:60px;
+  --sidebar-w:264px;
+
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important;}
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1100px 480px at 12% -8%, rgba(242,184,75,.06), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(127,216,196,.05), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+::selection{background:var(--gold);color:#1a1300;}
+
+/* scrollbar */
+::-webkit-scrollbar{width:11px;height:11px;}
+::-webkit-scrollbar-track{background:var(--bg-deep);}
+::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:8px;border:2px solid var(--bg-deep);}
+::-webkit-scrollbar-thumb:hover{background:#333850;}
+*{scrollbar-color:var(--surface-3) var(--bg-deep); scrollbar-width:thin;}
+
+a{color:inherit;}
+p{margin:0 0 .7em;}
+p:last-child{margin-bottom:0;}
+
+.skip-link{
+  position:absolute;left:-999px;top:0;background:var(--gold);color:#1a1300;
+  padding:.7em 1.2em;border-radius:0 0 8px 0;z-index:999;font-weight:600;font-family:var(--font-body);
+}
+.skip-link:focus{left:0;}
+
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px;}
+
+/* ============================================================
+   TOP BAR + PROGRESS
+   ============================================================ */
+#progressBar{
+  position:fixed;top:0;left:0;height:2px;width:0%;
+  background:linear-gradient(90deg,var(--coral),var(--gold),var(--teal));
+  z-index:200;transition:width .08s linear;
+}
+
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--topbar-h);
+  display:flex;align-items:center;gap:16px;
+  padding:0 20px;
+  background:rgba(18,20,27,.86);
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--border-soft);
+  z-index:150;
+}
+.brand{
+  display:flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-weight:700;font-size:.92rem;
+  white-space:nowrap;letter-spacing:.01em;
+  flex-shrink:0;
+}
+.brand .bracket{color:var(--coral);}
+.brand .dot{color:var(--gold);}
+.brand small{display:block;font-family:var(--font-body);font-weight:500;color:var(--text-faint);font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;margin-top:1px;}
+
+.menu-toggle{
+  display:none;
+  background:none;border:1px solid var(--border);color:var(--text);
+  width:38px;height:38px;border-radius:var(--radius-sm);
+  align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+  font-size:1.1rem;
+}
+
+.search-wrap{
+  flex:1;max-width:480px;margin-left:auto;
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:999px;padding:0 8px 0 16px;height:40px;
+  transition:border-color .15s var(--ease);
+}
+.search-wrap:focus-within{border-color:var(--gold);}
+.search-wrap svg{flex-shrink:0;color:var(--text-faint);width:16px;height:16px;}
+#searchInput{
+  flex:1;background:none;border:none;outline:none;color:var(--text);
+  font-family:var(--font-body);font-size:.9rem;min-width:0;
+}
+#searchInput::placeholder{color:var(--text-faint);}
+.search-count{
+  font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);
+  white-space:nowrap;flex-shrink:0;
+}
+.search-nav{display:flex;gap:2px;flex-shrink:0;}
+.search-nav button{
+  background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);
+  width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:.7rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.search-nav button:hover{color:var(--gold);border-color:var(--gold);}
+.search-nav button:disabled{opacity:.3;cursor:default;}
+.search-nav button:disabled:hover{color:var(--text-dim);border-color:var(--border);}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.layout{
+  display:flex;
+  padding-top:var(--topbar-h);
+  max-width:1440px;
+  margin:0 auto;
+}
+
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  position:sticky;top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h));
+  overflow-y:auto;
+  padding:26px 14px 40px 24px;
+  border-right:1px solid var(--border-soft);
+}
+.sidebar-label{
+  font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-faint);padding:0 10px;margin-bottom:10px;
+}
+.sidebar nav{display:flex;flex-direction:column;gap:1px;}
+.sidebar nav a{
+  display:flex;align-items:baseline;gap:10px;
+  padding:7px 10px;border-radius:8px;
+  text-decoration:none;color:var(--text-dim);font-size:.86rem;
+  border-left:2px solid transparent;
+  transition:background .12s,color .12s;
+}
+.sidebar nav a .n{font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);flex-shrink:0;}
+.sidebar nav a:hover{background:var(--surface);color:var(--text);}
+.sidebar nav a.active{background:var(--gold-soft);color:var(--gold);border-left-color:var(--gold);}
+.sidebar nav a.active .n{color:var(--gold);}
+
+.wizard-launch{
+  margin-top:18px;width:100%;
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface-2);border:1px dashed var(--border);
+  color:var(--text);padding:12px 14px;border-radius:var(--radius-md);
+  cursor:pointer;font-family:var(--font-body);font-size:.84rem;font-weight:600;
+  text-align:left;
+}
+.wizard-launch:hover{border-color:var(--teal);background:var(--surface-3);}
+.wizard-launch .ic{font-size:1.05rem;flex-shrink:0;}
+.wizard-launch span small{display:block;font-weight:400;color:var(--text-faint);font-size:.74rem;margin-top:1px;}
+
+.sidebar-overlay{display:none;}
+
+main{
+  flex:1;min-width:0;
+  padding:0 clamp(20px,4vw,56px) 100px;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  padding:56px 0 44px;
+  display:grid;grid-template-columns:1.15fr .85fr;gap:44px;
+  align-items:center;
+  border-bottom:1px solid var(--border-soft);
+  margin-bottom:52px;
+}
+.hero-eyebrow{
+  font-family:var(--font-mono);font-size:.76rem;color:var(--teal);
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.hero-eyebrow::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px var(--teal-soft);}
+.hero h1{
+  font-family:var(--font-display);font-weight:600;font-size:clamp(2.1rem,4.4vw,3.35rem);
+  line-height:1.06;margin:0 0 18px;letter-spacing:-.01em;
+}
+.hero h1 em{color:var(--gold);font-style:normal;}
+.hero-sub{
+  font-size:1.04rem;color:var(--text-dim);max-width:52ch;margin-bottom:26px;
+}
+.hero-sub code{color:var(--teal);}
+.hero-stats{display:flex;gap:28px;flex-wrap:wrap;}
+.hero-stat b{
+  display:block;font-family:var(--font-display);font-weight:600;font-size:1.7rem;color:var(--text);
+}
+.hero-stat span{font-size:.76rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;}
+
+/* specimen card */
+.specimen{
+  position:relative;
+  background:linear-gradient(165deg,var(--surface) 0%,var(--surface-2) 100%);
+  border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:30px 28px 26px;min-height:270px;
+  display:flex;flex-direction:column;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.03);
+}
+.specimen::before{
+  content:'';position:absolute;top:0;left:28px;right:28px;height:1px;
+  background:repeating-linear-gradient(90deg,var(--border) 0 6px,transparent 6px 11px);
+}
+.specimen-label{
+  font-family:var(--font-mono);font-size:.68rem;color:var(--text-faint);
+  display:flex;justify-content:space-between;letter-spacing:.06em;text-transform:uppercase;margin-bottom:22px;
+}
+.specimen-label #specimenIndex{color:var(--gold);}
+.specimen-tag{
+  font-family:var(--font-mono);font-weight:700;font-size:clamp(1.7rem,3.4vw,2.3rem);
+  color:var(--coral);margin-bottom:14px;line-height:1;
+  transition:opacity .25s var(--ease);
+}
+.specimen-purpose{
+  font-family:var(--font-display);font-style:italic;font-size:1.06rem;color:var(--text);
+  line-height:1.5;flex:1;transition:opacity .25s var(--ease);
+}
+.specimen.fade .specimen-tag,.specimen.fade .specimen-purpose{opacity:0;}
+.specimen-foot{
+  display:flex;justify-content:space-between;align-items:center;margin-top:20px;
+  border-top:1px solid var(--border-soft);padding-top:14px;
+}
+.specimen-dots{display:flex;gap:5px;}
+.specimen-dots span{width:5px;height:5px;border-radius:50%;background:var(--border);}
+.specimen-dots span.on{background:var(--gold);}
+.specimen-next{
+  background:none;border:1px solid var(--border);color:var(--text-dim);
+  font-family:var(--font-mono);font-size:.7rem;padding:6px 12px;border-radius:999px;cursor:pointer;
+}
+.specimen-next:hover{border-color:var(--gold);color:var(--gold);}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;padding-top:36px;}
+}
+
+/* ============================================================
+   SECTIONS — shared
+   ============================================================ */
+.handbook-section{padding:26px 0 54px;border-bottom:1px solid var(--border-soft);scroll-margin-top:calc(var(--topbar-h) + 16px);}
+.handbook-section:last-of-type{border-bottom:none;}
+
+.section-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:18px;}
+.section-num{
+  font-family:var(--font-mono);font-weight:600;font-size:.82rem;color:var(--gold);
+  border:1px solid var(--gold-soft);background:var(--gold-soft);
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;margin-top:2px;
+}
+.section-head h2{
+  font-family:var(--font-display);font-weight:600;font-size:1.55rem;margin:0 0 6px;letter-spacing:-.01em;
+}
+.section-intro{color:var(--text-dim);max-width:70ch;font-size:.95rem;}
+.section-intro code{color:var(--teal);}
+
+.subhead{
+  font-family:var(--font-mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-faint);margin:26px 0 10px;padding-top:2px;
+}
+
+/* spec rows (data-driven entry tables) */
+.entries{display:flex;flex-direction:column;border-top:1px solid var(--border-soft);}
+.spec-row{
+  display:grid;grid-template-columns:190px 1fr;gap:18px;
+  padding:13px 12px;border-bottom:1px solid var(--border-soft);
+  border-left:2px solid transparent;
+  transition:background .15s,border-color .15s;
+}
+.spec-row:hover{background:var(--surface);}
+.spec-row.is-match{background:var(--gold-soft);}
+.spec-row.is-current{border-left-color:var(--gold);background:var(--gold-soft);}
+.tag-chip{
+  font-family:var(--font-mono);font-weight:600;font-size:.82rem;color:var(--coral);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;align-self:start;
+}
+.spec-purpose{font-size:.9rem;color:var(--text);margin:0;}
+.spec-note{font-size:.82rem;color:var(--text-faint);margin:.35em 0 0;}
+.spec-example{font-family:var(--font-mono);font-size:.78rem;color:var(--lime);margin-top:.35em;}
+
+@media (max-width:640px){
+  .spec-row{grid-template-columns:1fr;gap:5px;}
+}
+
+/* inline code mentions in prose */
+code.inline{
+  font-family:var(--font-mono);background:var(--surface-2);color:var(--teal);
+  padding:.1em .42em;border-radius:5px;font-size:.87em;border:1px solid var(--border-soft);
+}
+
+/* code panels */
+.code-panel{
+  background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--radius-md);
+  overflow:hidden;margin:16px 0;
+}
+.code-panel-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;border-bottom:1px solid var(--border);background:var(--surface);
+}
+.code-panel-bar .lang{font-family:var(--font-mono);font-size:.7rem;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;}
+.copy-btn{
+  background:none;border:1px solid var(--border);color:var(--text-dim);
+  font-family:var(--font-mono);font-size:.7rem;padding:5px 11px;border-radius:6px;cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+}
+.copy-btn:hover{border-color:var(--gold);color:var(--gold);}
+.copy-btn.copied{border-color:var(--lime);color:var(--lime);}
+.code-panel pre{margin:0;padding:16px 18px;overflow-x:auto;}
+.code-panel code{
+  font-family:var(--font-mono);font-size:.82rem;line-height:1.65;white-space:pre;color:var(--text);
+}
+/* highlight.js token colors */
+.hljs-tag{color:var(--text-faint);}
+.hljs-name{color:var(--coral);}
+.hljs-attr{color:var(--teal);}
+.hljs-string{color:var(--lime);}
+.hljs-comment{color:var(--text-faint);font-style:italic;}
+.hljs-meta,.hljs-doctag{color:var(--gold);}
+.hljs-meta-string{color:var(--lime);}
+
+/* demo grids */
+.demo{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;align-items:stretch;
+}
+.demo .code-panel{margin:0;}
+.live-panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:16px 18px;display:flex;flex-direction:column;
+}
+.live-label{
+  font-family:var(--font-mono);font-size:.7rem;color:var(--lime);letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:12px;display:flex;align-items:center;gap:6px;
+}
+.live-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--lime);}
+.live-stage{flex:1;display:flex;align-items:center;}
+.live-stage.stack{flex-direction:column;align-items:stretch;gap:10px;}
+
+@media (max-width:800px){
+  .demo{grid-template-columns:1fr;}
+}
+
+/* callouts */
+.callout{
+  border-left:3px solid var(--teal);background:var(--teal-soft);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  padding:13px 16px;margin:16px 0;font-size:.89rem;color:var(--text);
+}
+.callout.warn{border-color:var(--gold);background:var(--gold-soft);}
+.callout.danger{border-color:var(--coral);background:var(--coral-soft);}
+.callout b{color:inherit;}
+.callout code{font-family:var(--font-mono);color:inherit;background:rgba(255,255,255,.08);padding:.1em .4em;border-radius:4px;font-size:.9em;}
+
+/* chips (void elements, deprecated, global attrs) */
+.chip-grid{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;}
+.el-chip{
+  font-family:var(--font-mono);font-size:.84rem;font-weight:600;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:8px 13px;color:var(--teal);
+}
+.el-chip.deprecated{
+  display:flex;flex-direction:column;gap:3px;color:var(--coral);
+  text-decoration:line-through;text-decoration-color:rgba(255,122,133,.5);
+  min-width:140px;
+}
+.el-chip.deprecated .use-instead{
+  font-family:var(--font-body);font-weight:400;font-size:.72rem;color:var(--lime);
+  text-decoration:none;
+}
+
+/* attribute table */
+.attr-grid{display:flex;flex-direction:column;border-top:1px solid var(--border-soft);}
+
+/* checklist */
+.checklist{display:flex;flex-direction:column;gap:8px;margin:16px 0;}
+.check-item{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:13px 15px;cursor:pointer;user-select:none;
+}
+.check-item .box{
+  width:20px;height:20px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;transition:all .12s;
+}
+.check-item.on .box{background:var(--lime);border-color:var(--lime);}
+.check-item .box svg{width:12px;height:12px;opacity:0;transition:opacity .12s;color:#12141b;}
+.check-item.on .box svg{opacity:1;}
+.check-item.on p{color:var(--text-dim);}
+.check-item p{margin:0;font-size:.89rem;}
+.check-item p b{color:var(--text);}
+.check-item.on p b{color:var(--text-dim);text-decoration:line-through;text-decoration-color:var(--text-faint);}
+
+/* entity table */
+.entity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin:16px 0;}
+.entity-cell{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:10px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.entity-cell code{font-family:var(--font-mono);font-size:.8rem;color:var(--teal);}
+.entity-cell .glyph{font-family:var(--font-display);font-size:1.15rem;color:var(--gold);}
+
+/* skeleton wireframe (section 3) */
+.wireframe{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:14px;font-family:var(--font-mono);font-size:.74rem;color:var(--text-faint);
+}
+.wf-box{border:1px dashed var(--border);border-radius:6px;padding:10px;margin-bottom:8px;}
+.wf-box:last-child{margin-bottom:0;}
+.wf-box .wf-tag{color:var(--coral);font-weight:600;}
+.wf-row{display:flex;gap:8px;}
+.wf-row .wf-box{flex:1;margin-bottom:0;}
+
+/* form showcase */
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:.76rem;color:var(--text-faint);font-family:var(--font-mono);}
+.field input,.field select,.field textarea{
+  background:var(--bg-deep);border:1px solid var(--border);color:var(--text);
+  padding:8px 10px;border-radius:7px;font-family:var(--font-body);font-size:.86rem;width:100%;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);outline:none;}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.type-showcase{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:16px 0;}
+
+/* buttons (generic) */
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:.84rem;
+  border-radius:8px;padding:9px 16px;cursor:pointer;border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text);
+}
+.btn:hover{border-color:var(--teal);}
+.btn.primary{background:var(--gold);color:#1a1300;border-color:var(--gold);}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.ghost{background:none;}
+
+/* dialog */
+dialog{
+  background:var(--surface);color:var(--text);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:0;max-width:480px;width:92vw;
+  box-shadow:0 40px 80px -20px rgba(0,0,0,.7);
+}
+dialog::backdrop{background:rgba(6,7,10,.72);backdrop-filter:blur(3px);}
+.dialog-body{padding:26px 26px 22px;}
+.dialog-body h3{font-family:var(--font-display);font-size:1.25rem;margin:0 0 10px;}
+.dialog-body p{color:var(--text-dim);font-size:.92rem;}
+.dialog-close-row{display:flex;justify-content:flex-end;padding:14px 22px;border-top:1px solid var(--border-soft);}
+
+/* wizard dialog specifics */
+#wizardDialog{max-width:520px;}
+.wizard-progress{display:flex;gap:5px;padding:20px 26px 0;}
+.wizard-progress span{flex:1;height:3px;border-radius:2px;background:var(--border);}
+.wizard-progress span.done{background:var(--gold);}
+.wizard-q{font-family:var(--font-display);font-size:1.15rem;line-height:1.4;margin:18px 0 22px;}
+.wizard-actions{display:flex;gap:10px;}
+.wizard-actions .btn{flex:1;}
+.wizard-result{display:none;}
+.wizard-result.show{display:block;}
+.wizard-result .tag-chip{font-size:1.4rem;display:block;margin-bottom:10px;}
+
+/* popover */
+[popover]{
+  background:var(--surface);color:var(--text);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:8px;margin:auto 0 0 8px;
+  box-shadow:0 20px 50px -15px rgba(0,0,0,.6);
+}
+[popover] a{
+  display:block;padding:9px 14px;border-radius:7px;text-decoration:none;font-size:.88rem;color:var(--text-dim);
+}
+[popover] a:hover{background:var(--surface-2);color:var(--gold);}
+
+/* toast */
+#toast{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--surface-3);border:1px solid var(--border);color:var(--text);
+  padding:12px 20px;border-radius:999px;font-size:.86rem;box-shadow:0 20px 40px -10px rgba(0,0,0,.6);
+  z-index:300;opacity:0;pointer-events:none;transition:all .25s var(--ease);
+  display:flex;align-items:center;gap:8px;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast .dot{width:7px;height:7px;border-radius:50%;background:var(--lime);}
+
+/* back to top */
+#backToTop{
+  position:fixed;bottom:26px;right:26px;width:44px;height:44px;border-radius:50%;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:120;
+  opacity:0;pointer-events:none;transform:translateY(10px);transition:all .25s var(--ease);
+}
+#backToTop.show{opacity:1;pointer-events:auto;transform:translateY(0);}
+#backToTop:hover{border-color:var(--gold);color:var(--gold);}
+
+/* misc lab items */
+.sentence-lab{
+  font-family:var(--font-body);font-size:1rem;line-height:2;color:var(--text);
+}
+.sentence-lab abbr{cursor:help;text-decoration-color:var(--text-faint);}
+
+.editable-box{
+  background:var(--bg-deep);border:1px solid var(--border);border-radius:8px;
+  padding:12px;font-size:.88rem;min-height:60px;
+}
+.editable-box:focus{outline:2px solid var(--teal);outline-offset:2px;}
+.dragzone-row{display:flex;gap:10px;}
+.drag-item,.drop-target{
+  border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.82rem;text-align:center;
+}
+.drag-item{background:var(--surface-2);cursor:grab;color:var(--gold);font-family:var(--font-mono);}
+.drop-target{flex:1;background:var(--bg-deep);border-style:dashed;color:var(--text-faint);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.drop-target.over{border-color:var(--teal);color:var(--teal);background:var(--teal-soft);}
+.tab-order-row{display:flex;gap:10px;}
+.tab-order-row .box{
+  flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;
+  padding:14px;text-align:center;font-family:var(--font-mono);font-size:.82rem;color:var(--text-dim);
+}
+.tab-order-row .box:focus{background:var(--gold-soft);border-color:var(--gold);color:var(--gold);}
+
+.placeholder-img{
+  border-radius:var(--radius-md);border:1px solid var(--border);
+  background:
+    repeating-linear-gradient(135deg, var(--surface-2) 0 10px, var(--surface) 10px 20px);
+  display:flex;align-items:center;justify-content:center;color:var(--text-faint);
+  font-family:var(--font-mono);font-size:.72rem;text-align:center;padding:20px;min-height:110px;
+}
+
+.canvas-wrap canvas{border-radius:8px;background:var(--bg-deep);border:1px solid var(--border);display:block;width:100%;height:auto;}
+
+footer.site-footer{
+  max-width:70ch;margin:20px 0 0;padding:36px 0 10px;color:var(--text-faint);font-size:.88rem;
+  border-top:1px solid var(--border-soft);
+}
+footer.site-footer code{font-family:var(--font-mono);color:var(--text-dim);}
+
+/* ============================================================
+   CSS-GUIDE SPECIFIC COMPONENTS
+   ============================================================ */
+.playground{
+  background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:20px;margin:16px 0;
+}
+.playground-controls{display:flex;flex-direction:column;gap:12px;margin-bottom:18px;}
+.control-group{display:flex;flex-direction:column;gap:7px;}
+.control-group .lbl{font-family:var(--font-mono);font-size:.68rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;}
+
+.pill-group{display:flex;flex-wrap:wrap;gap:6px;}
+.pill-group button{
+  font-family:var(--font-mono);font-size:.72rem;padding:7px 13px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--text-dim);cursor:pointer;
+}
+.pill-group button:hover{border-color:var(--teal);color:var(--text);}
+.pill-group button.active{background:var(--gold);color:#1a1300;border-color:var(--gold);font-weight:600;}
+
+.slider-row{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--text-dim);margin-bottom:2px;}
+.slider-row label{width:150px;flex-shrink:0;font-family:var(--font-mono);font-size:.74rem;color:var(--text-faint);}
+.slider-row input[type=range]{flex:1;accent-color:var(--gold);}
+.slider-row .val{width:56px;text-align:right;font-family:var(--font-mono);color:var(--gold);flex-shrink:0;font-size:.78rem;}
+
+.stage{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:24px;min-height:120px;display:flex;align-items:center;justify-content:center;
+}
+
+.flex-stage{display:flex;gap:10px;width:100%;min-height:140px;padding:14px;border-radius:8px;background:var(--surface-2);transition:all .2s var(--ease);}
+.grid-stage{display:grid;gap:10px;width:100%;min-height:180px;padding:14px;border-radius:8px;background:var(--surface-2);transition:all .2s var(--ease);}
+.demo-item{
+  background:linear-gradient(135deg,var(--coral),var(--gold));color:#1a1300;
+  font-family:var(--font-mono);font-weight:700;font-size:.82rem;
+  display:flex;align-items:center;justify-content:center;border-radius:8px;
+  min-width:44px;min-height:44px;padding:10px;transition:all .2s var(--ease);
+}
+.demo-item:nth-child(2){background:linear-gradient(135deg,var(--teal),var(--lime));}
+.demo-item:nth-child(3){background:linear-gradient(135deg,var(--gold),var(--lime));}
+.demo-item:nth-child(4){background:linear-gradient(135deg,var(--coral),var(--teal));}
+.demo-item:nth-child(5){background:linear-gradient(135deg,var(--lime),var(--gold));}
+
+.box-model-wrap{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;}
+.box-model-visual{
+  background:repeating-linear-gradient(45deg,rgba(255,122,133,.08) 0 8px,transparent 8px 16px);
+  border:2px dashed var(--coral); border-radius:4px; padding:var(--m,20px);
+  transition:all .15s var(--ease); flex-shrink:0;
+}
+.box-model-border{
+  background:var(--gold-soft); border:var(--bw,4px) solid var(--gold);
+  padding:var(--p,16px); transition:all .15s var(--ease); border-radius:2px;
+}
+.box-model-content{
+  background:var(--teal); color:#0b1512; width:var(--cw,120px); height:80px;
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.72rem;
+  text-align:center;transition:all .15s var(--ease);border-radius:2px;
+}
+.box-model-labels{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--font-mono);font-size:.72rem;}
+.box-model-labels span{display:flex;align-items:center;gap:6px;color:var(--text-dim);}
+.box-model-labels i{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+.swatch-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;}
+.swatch{border-radius:10px;overflow:hidden;border:1px solid var(--border);width:110px;}
+.swatch .fill{height:56px;}
+.swatch code{display:block;font-size:.68rem;padding:6px 8px;background:var(--surface);color:var(--text-dim);}
+
+.toggle-switch{
+  display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;
+  font-size:.85rem;color:var(--text-dim);
+}
+.toggle-switch .track{
+  width:42px;height:24px;border-radius:999px;background:var(--surface-3);border:1px solid var(--border);
+  position:relative;transition:background .2s;flex-shrink:0;
+}
+.toggle-switch .thumb{
+  position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--text-dim);
+  transition:all .2s var(--ease);
+}
+.toggle-switch input{display:none;}
+.toggle-switch input:checked + .track{background:var(--gold);border-color:var(--gold);}
+.toggle-switch input:checked + .track .thumb{transform:translateX(18px);background:#1a1300;}
+
+.debug-card{
+  background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--coral);
+  border-radius:0 var(--radius-md) var(--radius-md) 0;padding:14px 16px;margin-bottom:10px;
+}
+.debug-card b{color:var(--coral);display:block;margin-bottom:4px;font-size:.9rem;}
+.debug-card p{color:var(--text-dim);font-size:.85rem;margin:0;}
+
+.cq-slider-wrap{width:100%;}
+.cq-container{
+  border:1px dashed var(--teal);border-radius:8px;padding:14px;margin:0 auto;transition:width .1s;
+  container-type:inline-size;
+}
+.cq-card{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.cq-card img{width:100%;border-radius:6px;height:60px;flex-shrink:0;}
+@container (min-width: 400px){
+  .cq-card{flex-direction:row;align-items:center;}
+  .cq-card img{width:90px;height:70px;}
+}
+
+.scroll-carousel{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 4px 14px;scrollbar-width:thin;scrollbar-color:var(--gold) transparent;}
+.scroll-carousel .card{
+  scroll-snap-align:center;flex-shrink:0;width:150px;height:90px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);color:#1a1300;font-weight:700;
+}
+
+dl.spec-list{display:flex;flex-direction:column;gap:0;}
+
+/* --- live demo enablers, CSS guide specific --- */
+#hasDemoCard:has(img){border-color:var(--gold) !important;background:var(--gold-soft);}
+#selectionDemo::selection{background:var(--gold);color:#1a1300;}
+#markerDemo li::marker{color:var(--gold);font-size:1.1em;}
+#darkModeCard{background:light-dark(#ffffff,#0b0f19);color:light-dark(#111827,#e5e7eb);}
+
+#cpStage{--color-primary:#6366f1;--radius:12px;--spacing-md:16px;}
+#cpButton{background:var(--color-primary);padding:var(--spacing-md);border-radius:var(--radius);}
+#cpCard{border-color:var(--color-primary);border-radius:var(--radius);padding:var(--spacing-md);}
+
+@keyframes fadeInDemo{ from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+/* highlight.js — CSS-language tokens */
+.hljs-selector-class,.hljs-selector-id,.hljs-selector-tag,.hljs-selector-pseudo,.hljs-selector-attr{color:var(--coral);}
+.hljs-property,.hljs-attribute{color:var(--teal);}
+.hljs-number{color:var(--lime);}
+.hljs-keyword,.hljs-at-rule{color:var(--gold);}
+.hljs-variable,.hljs-template-variable{color:var(--gold);}
+.hljs-built_in{color:var(--teal);}
+
+
+@media (max-width:900px){
+  .menu-toggle{display:flex;}
+  .sidebar{
+    position:fixed;top:var(--topbar-h);left:0;bottom:0;z-index:180;
+    background:var(--bg);width:82vw;max-width:320px;
+    transform:translateX(-100%);transition:transform .25s var(--ease);
+    border-right:1px solid var(--border);
+  }
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay{
+    display:none;position:fixed;inset:var(--topbar-h) 0 0 0;background:rgba(0,0,0,.5);z-index:170;
+  }
+  .sidebar-overlay.show{display:block;}
+  .search-wrap{max-width:none;}
+  .brand small{display:none;}
+}
+@media (max-width:560px){
+  .hero-stats{gap:20px;}
+  .field-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div id="progressBar"></div>
+
+<header class="topbar">
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle section menu" aria-expanded="false">☰</button>
+  <div class="brand"><span class="bracket">&lt;/&gt;</span> HTML5 Field Guide<span class="dot">.</span>
+    <small>Interactive reference</small>
+  </div>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="searchInput" type="search" placeholder="Find a tag or attribute…" autocomplete="off" aria-label="Search the handbook">
+    <span class="search-count" id="searchCount"></span>
+    <div class="search-nav">
+      <button id="prevMatch" aria-label="Previous match" disabled>↑</button>
+      <button id="nextMatch" aria-label="Next match" disabled>↓</button>
+    </div>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-label">On this page</div>
+    <nav id="sideNav">
+      <a href="#sec-1"><span class="n">01</span>Cascade &amp; Specificity</a>
+      <a href="#sec-2"><span class="n">02</span>Selectors</a>
+      <a href="#sec-3"><span class="n">03</span>Box Model &amp; Display</a>
+      <a href="#sec-4"><span class="n">04</span>Units &amp; Functions</a>
+      <a href="#sec-5"><span class="n">05</span>Typography</a>
+      <a href="#sec-6"><span class="n">06</span>Colors &amp; Dark Mode</a>
+      <a href="#sec-7"><span class="n">07</span>Flexbox</a>
+      <a href="#sec-8"><span class="n">08</span>CSS Grid</a>
+      <a href="#sec-9"><span class="n">09</span>Positioning</a>
+      <a href="#sec-10"><span class="n">10</span>Media &amp; Container Queries</a>
+      <a href="#sec-11"><span class="n">11</span>Borders, Shadows &amp; Filters</a>
+      <a href="#sec-12"><span class="n">12</span>Transitions &amp; Transforms</a>
+      <a href="#sec-13"><span class="n">13</span>Custom Properties</a>
+      <a href="#sec-14"><span class="n">14</span>Cascade &amp; Architecture</a>
+      <a href="#sec-15"><span class="n">15</span>Overflow &amp; Scroll</a>
+      <a href="#sec-16"><span class="n">16</span>Common Gotchas</a>
+      <a href="#sec-17"><span class="n">17</span>Outdated Patterns</a>
+      <a href="#sec-18"><span class="n">18</span>Decision Cheat Sheets</a>
+    </nav>
+    <button class="wizard-launch" id="openWizard">
+      <span class="ic">🧭</span>
+      <span>Flexbox? Grid? rem?<small>Interactive decision helper</small></span>
+    </button>
+  </aside>
+
+  <main id="main-content">
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="hero-eyebrow">Field guide · the CSS that actually ships in 2026</div>
+        <h1>Style it the <em>right</em> way,<br>not just <em>a</em> way.</h1>
+        <p class="hero-sub">Organized by what each property is <em>for</em> — plus the 2026 additions (container queries, <code class="inline">:has()</code>, native nesting, cascade layers) that genuinely replaced Sass and JS positioning libraries. Keep this open through Week 1 <i>and</i> Week 4 — Tailwind is just these same properties with shorter names.</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><b>18</b><span>Sections</span></div>
+          <div class="hero-stat"><b>30</b><span>Code examples</span></div>
+          <div class="hero-stat"><b id="demoCount">25+</b><span>Live playgrounds</span></div>
+        </div>
+      </div>
+      <div class="specimen" id="specimen">
+        <div class="specimen-label"><span>Feature <span id="specimenIndex">01</span> / 10</span><span>field notes</span></div>
+        <div class="specimen-tag" id="specimenTag">:has()</div>
+        <div class="specimen-purpose" id="specimenPurpose">The "parent selector" CSS never had until now — style an element based on what's inside it. Baseline since late 2023.</div>
+        <div class="specimen-foot">
+          <div class="specimen-dots" id="specimenDots"></div>
+          <button class="specimen-next" id="specimenNext">next feature →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 1 — CASCADE, SPECIFICITY, INHERITANCE ============ -->
+    <section class="handbook-section" id="sec-1">
+      <div class="section-head">
+        <span class="section-num">01</span>
+        <div><h2>The Mental Model: Cascade, Specificity, Inheritance</h2>
+        <p class="section-intro">Read this first — it explains <i>why</i> your CSS does what it does, which matters more than memorizing any single property.</p></div>
+      </div>
+
+      <div class="subhead">The cascade — who wins when several rules apply</div>
+      <div class="entries">
+        <div class="spec-row"><code class="tag-chip">1. Importance</code><div class="spec-body"><p class="spec-purpose"><code class="inline">!important</code> beats everything — which is exactly why overusing it causes chaos.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">2. Specificity</code><div class="spec-body"><p class="spec-purpose">Inline style (1000) &gt; <code class="inline">#id</code> (100) &gt; <code class="inline">.class</code>, <code class="inline">[attr]</code>, <code class="inline">:pseudo-class</code> (10) &gt; element, <code class="inline">::pseudo-element</code> (1). The universal selector <code class="inline">*</code> has zero specificity.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">3. Source order</code><div class="spec-body"><p class="spec-purpose">Later rules win ties.</p></div></div>
+      </div>
+
+      <div class="subhead">Try it — the exact example from the handbook</div>
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp1"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-css" id="bp1">#nav .link { color: blue; }   /* specificity: 110 */
+.link { color: red; }         /* specificity: 10 */</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — toggle the rules</div>
+          <div class="live-stage stack">
+            <p id="specBattleText" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;margin:0 0 6px;">.link</p>
+            <label class="toggle-switch"><input type="checkbox" id="specToggleId" checked><span class="track"><span class="thumb"></span></span> Enable <code class="inline">#nav .link</code> (110)</label>
+            <label class="toggle-switch"><input type="checkbox" id="specToggleClass" checked><span class="track"><span class="thumb"></span></span> Enable <code class="inline">.link</code> (10)</label>
+            <label class="toggle-switch"><input type="checkbox" id="specToggleImportant"><span class="track"><span class="thumb"></span></span> Add <code class="inline">!important</code> to <code class="inline">.link</code></label>
+            <p id="specBattleResult" style="font-size:.82rem;color:var(--text-faint);margin-top:8px;"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="subhead">Inheritance — real, live</div>
+      <div class="live-panel">
+        <div class="live-label">Live</div>
+        <div style="color:var(--teal);padding:18px;border:1px solid var(--border);border-radius:8px;">
+          Parent has <code class="inline">color:teal</code> and <code class="inline">padding:18px</code> —
+          <span style="display:inline-block;margin-top:8px;border:1px dashed var(--border-soft);padding:0;">this child text inherits the teal color, but not the padding (box-model properties never inherit).</span>
+        </div>
+      </div>
+
+      <div class="subhead">Keywords that control this directly</div>
+      <div class="entries">
+        <div class="spec-row"><code class="tag-chip">inherit</code><div class="spec-body"><p class="spec-purpose">Force this property to take its parent's value.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">initial</code><div class="spec-body"><p class="spec-purpose">Reset to the property's default value.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">unset</code><div class="spec-body"><p class="spec-purpose"><code class="inline">inherit</code> if the property naturally inherits, <code class="inline">initial</code> otherwise.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">revert</code><div class="spec-body"><p class="spec-purpose">Reset to the browser's built-in default — undoing your own stylesheet.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 2 — SELECTORS ============ -->
+    <section class="handbook-section" id="sec-2">
+      <div class="section-head">
+        <span class="section-num">02</span>
+        <div><h2>Selectors</h2>
+        <p class="section-intro">How you target what you want to style.</p></div>
+      </div>
+      <div class="entries">
+        <div class="spec-row"><code class="tag-chip">*</code><div class="spec-body"><p class="spec-purpose">Everything.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">element</code><div class="spec-body"><p class="spec-purpose">e.g. <code class="inline">p</code>, <code class="inline">div</code>.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">.class</code><div class="spec-body"><p class="spec-purpose">Elements with that class.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">#id</code><div class="spec-body"><p class="spec-purpose">The element with that id.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">A B</code><div class="spec-body"><p class="spec-purpose">B anywhere inside A (descendant).</p></div></div>
+        <div class="spec-row"><code class="tag-chip">A &gt; B</code><div class="spec-body"><p class="spec-purpose">B as a direct child of A.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">A + B</code><div class="spec-body"><p class="spec-purpose">B immediately after A, same parent (adjacent sibling).</p></div></div>
+        <div class="spec-row"><code class="tag-chip">A ~ B</code><div class="spec-body"><p class="spec-purpose">Any B after A, same parent (general sibling).</p></div></div>
+        <div class="spec-row"><code class="tag-chip">[attr]</code><div class="spec-body"><p class="spec-purpose">Has the attribute at all.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">[attr="val"]</code><div class="spec-body"><p class="spec-purpose">Exact match.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">[attr^="val"]</code><div class="spec-body"><p class="spec-purpose">Starts with.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">[attr$="val"]</code><div class="spec-body"><p class="spec-purpose">Ends with.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">[attr*="val"]</code><div class="spec-body"><p class="spec-purpose">Contains.</p></div></div>
+      </div>
+
+      <div class="subhead">Pseudo-classes (state-based)</div>
+      <div class="chip-grid">
+        <span class="el-chip">:hover</span><span class="el-chip">:focus</span><span class="el-chip">:focus-visible</span><span class="el-chip">:active</span>
+        <span class="el-chip">:first-child</span><span class="el-chip">:last-child</span><span class="el-chip">:nth-child(2n)</span><span class="el-chip">:only-child</span>
+        <span class="el-chip">:checked</span><span class="el-chip">:disabled</span><span class="el-chip">:required</span><span class="el-chip">:not(...)</span>
+      </div>
+      <div class="callout"><code class="inline">:focus-visible</code> shows a focus ring only for keyboard users, not mouse clicks — use this over <code class="inline">:focus</code> for custom focus styles.</div>
+
+      <div class="subhead">The genuinely important modern ones</div>
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp2"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-css" id="bp2">/* :has() — the "parent selector" CSS never had.
+   Baseline since late 2023. */
+.card:has(img) { border-color: gold; }
+
+/* style a form if any field is invalid */
+form:has(:invalid) { border-color: red; }
+
+/* :is() / :where() — group selectors without repeating */
+:is(h1, h2, h3) { font-family: var(--font-heading); }
+/* :where() does the same, but always zero specificity */</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — real :has()</div>
+          <div class="live-stage stack">
+            <div id="hasDemoCard" style="border:2px solid var(--border);border-radius:10px;padding:16px;transition:border-color .2s;">
+              <p style="margin:0 0 10px;font-size:.85rem;">.card:has(img) { border-color: gold; }</p>
+              <div id="hasImgSlot"></div>
+            </div>
+            <button class="btn" id="hasToggleBtn">Add an &lt;img&gt; to the card</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="subhead">Pseudo-elements (target a part, not a state)</div>
+      <div class="chip-grid">
+        <span class="el-chip">::before</span><span class="el-chip">::after</span><span class="el-chip">::first-line</span><span class="el-chip">::first-letter</span>
+        <span class="el-chip">::placeholder</span><span class="el-chip">::selection</span><span class="el-chip">::backdrop</span><span class="el-chip">::marker</span>
+      </div>
+      <div class="demo">
+        <div class="live-panel" style="margin:0;">
+          <div class="live-label">Live — ::selection (try selecting this)</div>
+          <p id="selectionDemo" style="font-size:.9rem;">Click and drag to select this sentence — the highlight color is styled with a real <code class="inline">::selection</code> rule.</p>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — ::marker, styled directly</div>
+          <ul id="markerDemo" style="margin:0;padding-left:22px;font-size:.88rem;">
+            <li>No more list-style hacks</li>
+            <li>Marker color, size — all direct</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 3 — BOX MODEL & DISPLAY ============ -->
+    <section class="handbook-section" id="sec-3">
+      <div class="section-head">
+        <span class="section-num">03</span>
+        <div><h2>The Box Model &amp; display</h2>
+        <p class="section-intro">Every element is a box: <b style="color:var(--text)">content → padding → border → margin</b>, from the inside out.</p></div>
+      </div>
+
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp3"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp3">* {
+  box-sizing: border-box; /* width/height include padding + border.
+                              Set this globally — it's what you want,
+                              essentially always. */
+}</code></pre>
+      </div>
+      <div class="callout danger">Without <code class="inline">border-box</code> (the default, <code class="inline">content-box</code>), <code class="inline">width: 200px</code> plus <code class="inline">padding: 20px</code> renders as a 240px-wide box — a constant source of layout bugs for beginners. Try it below.</div>
+
+      <div class="subhead">The box model, live</div>
+      <div class="playground">
+        <div class="playground-controls">
+          <div class="control-group">
+            <span class="lbl">box-sizing</span>
+            <div class="pill-group" id="boxSizingGroup">
+              <button data-val="border-box" class="active">border-box</button>
+              <button data-val="content-box">content-box</button>
+            </div>
+          </div>
+          <div class="slider-row"><label>padding</label><input type="range" id="bmPadding" min="0" max="40" value="16"><span class="val" id="bmPaddingVal">16px</span></div>
+          <div class="slider-row"><label>border-width</label><input type="range" id="bmBorder" min="0" max="16" value="4"><span class="val" id="bmBorderVal">4px</span></div>
+          <div class="slider-row"><label>margin</label><input type="range" id="bmMargin" min="0" max="40" value="20"><span class="val" id="bmMarginVal">20px</span></div>
+        </div>
+        <div class="box-model-wrap">
+          <div class="box-model-visual" id="bmMarginBox">
+            <div class="box-model-border" id="bmBorderBox">
+              <div class="box-model-content" id="bmContentBox">content</div>
+            </div>
+          </div>
+          <div class="box-model-labels">
+            <span><i style="background:var(--coral);opacity:.3;"></i>margin</span>
+            <span><i style="background:var(--gold);"></i>border</span>
+            <span><i style="background:var(--gold-soft);"></i>padding</span>
+            <span><i style="background:var(--teal);"></i>content</span>
+            <span id="bmTotalOut" style="color:var(--text);font-weight:600;"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="subhead">display values</div>
+      <div class="entries">
+        <div class="spec-row"><code class="tag-chip">block</code><div class="spec-body"><p class="spec-purpose">Full width available, starts on a new line (<code class="inline">div</code>, <code class="inline">p</code>, <code class="inline">section</code>).</p></div></div>
+        <div class="spec-row"><code class="tag-chip">inline</code><div class="spec-body"><p class="spec-purpose">Flows with text, ignores <code class="inline">width</code>/<code class="inline">height</code>/vertical margin (<code class="inline">span</code>, <code class="inline">a</code>).</p></div></div>
+        <div class="spec-row"><code class="tag-chip">inline-block</code><div class="spec-body"><p class="spec-purpose">Flows with text but respects <code class="inline">width</code>/<code class="inline">height</code>/margin.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">flex</code><div class="spec-body"><p class="spec-purpose">See §07.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">grid</code><div class="spec-body"><p class="spec-purpose">See §08.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">none</code><div class="spec-body"><p class="spec-purpose">Removed entirely — no space reserved (different from <code class="inline">visibility: hidden</code>, which keeps the space).</p></div></div>
+        <div class="spec-row"><code class="tag-chip">contents</code><div class="spec-body"><p class="spec-purpose">The element itself disappears from layout; its children act as if they're direct children of its parent.</p></div></div>
+      </div>
+
+      <div class="subhead">Margin collapsing — the classic gotcha</div>
+      <p class="section-intro" style="margin-bottom:10px;">Two vertical margins between adjacent block siblings collapse into a single margin (the larger of the two), not the sum. Doesn't happen with flex/grid children, or horizontally.</p>
+      <div class="playground">
+        <div class="playground-controls">
+          <div class="slider-row"><label>box A margin-bottom</label><input type="range" id="mcA" min="0" max="60" value="20"><span class="val" id="mcAVal">20px</span></div>
+          <div class="slider-row"><label>box B margin-top</label><input type="range" id="mcB" min="0" max="60" value="30"><span class="val" id="mcBVal">30px</span></div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;display:block;">
+          <div style="background:var(--coral-soft);border:1px solid var(--coral);border-radius:6px;padding:10px;text-align:center;font-family:var(--font-mono);font-size:.78rem;" id="mcBoxA">box A</div>
+          <div style="background:var(--teal-soft);border:1px solid var(--teal);border-radius:6px;padding:10px;text-align:center;font-family:var(--font-mono);font-size:.78rem;" id="mcBoxB">box B</div>
+        </div>
+        <p style="text-align:center;margin-top:10px;font-family:var(--font-mono);font-size:.82rem;color:var(--gold);" id="mcResult"></p>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 4 — UNITS, VALUES & FUNCTIONS ============ -->
+    <section class="handbook-section" id="sec-4">
+      <div class="section-head">
+        <span class="section-num">04</span>
+        <div><h2>Units, Values &amp; Functions</h2>
+        <p class="section-intro">What your numbers are actually measured against.</p></div>
+      </div>
+      <div class="entries">
+        <div class="spec-row"><code class="tag-chip">px</code><div class="spec-body"><p class="spec-purpose">Absolute pixel.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">%</code><div class="spec-body"><p class="spec-purpose">Parent's size.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">em</code><div class="spec-body"><p class="spec-purpose">The element's own font-size — compounds when nested, a common surprise.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">rem</code><div class="spec-body"><p class="spec-purpose">The root (<code class="inline">&lt;html&gt;</code>) font-size — usually what you actually want for consistency.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">vw / vh</code><div class="spec-body"><p class="spec-purpose">1% of viewport width/height.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">dvh / svh / lvh</code><div class="spec-body"><p class="spec-purpose">Dynamic/small/large viewport height — solves the classic mobile bug where <code class="inline">100vh</code> gets covered by the browser's address bar. Use <code class="inline">dvh</code> for full-height mobile layouts now.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">ch</code><div class="spec-body"><p class="spec-purpose">Width of the <code class="inline">0</code> character — useful for readable line-length limits.</p></div></div>
+      </div>
+
+      <div class="subhead">Functions worth knowing cold</div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp4"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp4">width: calc(100% - 2rem);        /* mix units in one expression */
+width: min(90%, 600px);          /* whichever is smaller */
+width: max(300px, 50%);          /* whichever is larger */
+font-size: clamp(1rem, 2vw + 1rem, 2.5rem); /* fluid: min, preferred, max */</code></pre>
+      </div>
+      <div class="callout"><code class="inline">clamp()</code> is the single highest-value function for responsive typography and spacing — it replaces a whole tier of <code class="inline">@media</code> breakpoints for font-size scaling. Drag below to see it work.</div>
+
+      <div class="playground">
+        <div class="playground-controls">
+          <div class="control-group">
+            <span class="lbl">simulated viewport width</span>
+            <div class="slider-row" style="margin:0;"><input type="range" id="clampSlider" min="300" max="1400" value="700" style="flex:1;"><span class="val" id="clampSliderVal" style="width:70px;">700px</span></div>
+          </div>
+        </div>
+        <div class="stage" style="flex-direction:column;">
+          <p style="font-weight:700;margin:0 0 8px;transition:font-size .1s;" id="clampText">clamp(1rem, 2vw + 1rem, 2.5rem)</p>
+          <p style="font-family:var(--font-mono);font-size:.76rem;color:var(--text-faint);margin:0;" id="clampBreakdown"></p>
+        </div>
+      </div>
+
+      <div class="subhead">Colors — real, live swatches</div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp4b"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp4b">color: #3b82f6;
+color: rgb(59 130 246);
+color: rgb(59 130 246 / 0.5);           /* with alpha */
+color: hsl(217 91% 60%);
+color: oklch(65% 0.19 255);              /* perceptually uniform */
+color: color-mix(in srgb, blue 60%, white); /* blend directly in CSS */</code></pre>
+      </div>
+      <div class="swatch-row">
+        <div class="swatch"><div class="fill" style="background:#3b82f6;"></div><code>#3b82f6</code></div>
+        <div class="swatch"><div class="fill" style="background:rgb(59 130 246 / 0.5);background-color:#191c25;background-image:linear-gradient(rgb(59 130 246 / 0.5),rgb(59 130 246 / 0.5));"></div><code>rgb(.. / 0.5)</code></div>
+        <div class="swatch"><div class="fill" style="background:hsl(217 91% 60%);"></div><code>hsl(217 91% 60%)</code></div>
+        <div class="swatch"><div class="fill" style="background:oklch(65% 0.19 255);"></div><code>oklch(65% .19 255)</code></div>
+        <div class="swatch"><div class="fill" style="background:color-mix(in srgb, blue 60%, white);"></div><code>color-mix(...)</code></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 5 — TYPOGRAPHY ============ -->
+    <section class="handbook-section" id="sec-5">
+      <div class="section-head">
+        <span class="section-num">05</span>
+        <div><h2>Typography</h2>
+        <p class="section-intro">Text is the most inherited, most read, most fussed-over part of any page.</p></div>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp5"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp5">body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;      /* 100–900, or normal/bold */
+  line-height: 1.5;      /* unitless — always prefer this over a fixed px */
+  letter-spacing: 0.01em;
+}</code></pre>
+      </div>
+      <div class="entries">
+        <div class="spec-row"><code class="tag-chip">text-align</code><div class="spec-body"><p class="spec-purpose"><code class="inline">left</code> <code class="inline">right</code> <code class="inline">center</code> <code class="inline">justify</code></p></div></div>
+        <div class="spec-row"><code class="tag-chip">text-decoration</code><div class="spec-body"><p class="spec-purpose"><code class="inline">underline</code> <code class="inline">line-through</code> <code class="inline">none</code></p></div></div>
+        <div class="spec-row"><code class="tag-chip">text-transform</code><div class="spec-body"><p class="spec-purpose"><code class="inline">uppercase</code> <code class="inline">lowercase</code> <code class="inline">capitalize</code></p></div></div>
+        <div class="spec-row"><code class="tag-chip">white-space</code><div class="spec-body"><p class="spec-purpose">Controls wrapping/collapsing of spaces and line breaks (<code class="inline">nowrap</code>, <code class="inline">pre</code>, <code class="inline">pre-wrap</code>).</p></div></div>
+        <div class="spec-row"><code class="tag-chip">text-overflow: ellipsis</code><div class="spec-body"><p class="spec-purpose">Needs <code class="inline">overflow:hidden; white-space:nowrap;</code> on the same element to actually show <code class="inline">…</code>.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">text-wrap: balance</code><div class="spec-body"><p class="spec-purpose">Balances line lengths in a heading (2–6 lines) — no more awkward orphan words.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">text-wrap: pretty</code><div class="spec-body"><p class="spec-purpose">Prevents orphans in body text, lower-priority than <code class="inline">balance</code>.</p></div></div>
+      </div>
+
+      <div class="subhead">Live — line-height &amp; letter-spacing</div>
+      <div class="playground">
+        <div class="playground-controls">
+          <div class="slider-row"><label>line-height</label><input type="range" id="typoLH" min="10" max="25" value="15"><span class="val" id="typoLHVal">1.5</span></div>
+          <div class="slider-row"><label>letter-spacing</label><input type="range" id="typoLS" min="-2" max="15" value="1"><span class="val" id="typoLSVal">0.01em</span></div>
+        </div>
+        <div class="stage">
+          <p id="typoSample" style="margin:0;font-size:.95rem;">Line-height and letter-spacing do more for readability than almost any other typographic choice — small changes, large effect on how comfortable a paragraph is to read.</p>
+        </div>
+      </div>
+
+      <div class="demo">
+        <div class="live-panel" style="margin:0;">
+          <div class="live-label">Live — text-overflow: ellipsis</div>
+          <label class="toggle-switch" style="margin-bottom:10px;"><input type="checkbox" id="ellipsisToggle" checked><span class="track"><span class="thumb"></span></span> enabled</label>
+          <p id="ellipsisDemo" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;margin:0;font-size:.85rem;">This is a deliberately long line of text that will not fit in the box.</p>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — text-wrap: balance</div>
+          <label class="toggle-switch" style="margin-bottom:10px;"><input type="checkbox" id="balanceToggle" checked><span class="track"><span class="thumb"></span></span> enabled</label>
+          <h3 id="balanceDemo" style="font-family:var(--font-display);font-weight:600;font-size:1.15rem;margin:0;text-wrap:balance;">A heading that used to leave one awkward orphan word dangling on its own line</h3>
+        </div>
+      </div>
+
+      <div class="subhead">@font-face for custom fonts</div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp5b"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp5b">@font-face {
+  font-family: "MyFont";
+  src: url("myfont.woff2") format("woff2");
+  font-display: swap; /* show fallback text immediately, swap in
+                          the custom font when ready */
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 6 — COLORS, BACKGROUNDS & DARK MODE ============ -->
+    <section class="handbook-section" id="sec-6">
+      <div class="section-head">
+        <span class="section-num">06</span>
+        <div><h2>Colors, Backgrounds &amp; Dark Mode</h2>
+        <p class="section-intro">Fills, gradients, and the modern way to theme a site.</p></div>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp6"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp6">background-color: #0b0f19;
+background-image: url("bg.jpg");
+background-size: cover;       /* fills the box, may crop */
+background-position: center;
+background-repeat: no-repeat;
+background-image: linear-gradient(135deg, #6366f1, #ec4899);
+background-image: radial-gradient(circle, #fff, #ccc);</code></pre>
+      </div>
+      <div class="swatch-row">
+        <div class="swatch"><div class="fill" style="background-image:linear-gradient(135deg, #6366f1, #ec4899);"></div><code>linear-gradient</code></div>
+        <div class="swatch"><div class="fill" style="background-image:radial-gradient(circle, #fff, #6366f1);"></div><code>radial-gradient</code></div>
+      </div>
+
+      <div class="subhead">opacity vs. the alpha channel — trips people up constantly</div>
+      <div class="demo">
+        <div class="live-panel" style="margin:0;">
+          <div class="live-label">opacity: 0.5 — fades everything inside</div>
+          <div style="opacity:.5;background:var(--coral);border-radius:8px;padding:14px;display:flex;align-items:center;gap:10px;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#fff;flex-shrink:0;"></div>
+            <span style="color:#1a0505;font-weight:600;font-size:.85rem;">Text + circle both fade</span>
+          </div>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">background-color alpha only — children stay opaque</div>
+          <div style="background:rgb(127 216 196 / .5);border-radius:8px;padding:14px;display:flex;align-items:center;gap:10px;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#fff;flex-shrink:0;"></div>
+            <span style="color:#0b1512;font-weight:600;font-size:.85rem;">Only the fill is translucent</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="subhead">Dark mode, the modern way</div>
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp6b"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-css" id="bp6b">:root { color-scheme: light dark; } /* themes native scrollbars/inputs too */
+
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0b0f19; --text: #e5e7eb; }
+}
+body {
+  background: light-dark(#ffffff, #0b0f19); /* one line, right value */
+  color: light-dark(#111827, #e5e7eb);
+}</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — real light-dark()</div>
+          <div class="live-stage stack">
+            <label class="toggle-switch"><input type="checkbox" id="darkModeToggle" checked><span class="track"><span class="thumb"></span></span> <span id="darkModeLabel">dark</span></label>
+            <div id="darkModeCard" style="border-radius:10px;padding:16px;border:1px solid var(--border);transition:all .2s;">
+              <p id="darkModeText" style="margin:0;font-size:.85rem;">background: light-dark(#fff, #0b0f19)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 7 — FLEXBOX ============ -->
+    <section class="handbook-section" id="sec-7">
+      <div class="section-head">
+        <span class="section-num">07</span>
+        <div><h2>Flexbox — One-Dimensional Layout</h2>
+        <p class="section-intro">Arranges items along a <b style="color:var(--text)">single axis</b> — row or column. This is what powers a navbar or a row of cards.</p></div>
+      </div>
+
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp7"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp7">.container {
+  display: flex;
+  flex-direction: row;            /* row | row-reverse | column | column-reverse */
+  justify-content: space-between; /* main-axis alignment */
+  align-items: center;            /* cross-axis alignment */
+  flex-wrap: wrap;                /* nowrap | wrap | wrap-reverse */
+  gap: 1rem;                      /* prefer this over margin hacks */
+}
+.item {
+  flex-grow: 1;         /* how eagerly this item grows */
+  flex-shrink: 1;        /* how eagerly it shrinks */
+  flex-basis: 200px;     /* starting size before grow/shrink */
+  flex: 1 1 200px;       /* shorthand — 90% of the time, this */
+  align-self: flex-end;  /* override align-items for one item */
+  order: 2;               /* visually reorder, no HTML change */
+}</code></pre>
+      </div>
+
+      <div class="subhead">The playground — every value, live</div>
+      <div class="playground">
+        <div class="playground-controls">
+          <div class="control-group"><span class="lbl">flex-direction</span>
+            <div class="pill-group" data-prop="flexDirection">
+              <button data-val="row" class="active">row</button><button data-val="row-reverse">row-reverse</button>
+              <button data-val="column">column</button><button data-val="column-reverse">column-reverse</button>
+            </div>
+          </div>
+          <div class="control-group"><span class="lbl">justify-content</span>
+            <div class="pill-group" data-prop="justifyContent">
+              <button data-val="flex-start">flex-start</button><button data-val="center">center</button>
+              <button data-val="space-between" class="active">space-between</button><button data-val="space-around">space-around</button><button data-val="space-evenly">space-evenly</button>
+            </div>
+          </div>
+          <div class="control-group"><span class="lbl">align-items</span>
+            <div class="pill-group" data-prop="alignItems">
+              <button data-val="stretch" class="active">stretch</button><button data-val="flex-start">flex-start</button>
+              <button data-val="flex-end">flex-end</button><button data-val="center">center</button><button data-val="baseline">baseline</button>
+            </div>
+          </div>
+          <div class="control-group"><span class="lbl">flex-wrap</span>
+            <div class="pill-group" data-prop="flexWrap">
+              <button data-val="nowrap" class="active">nowrap</button><button data-val="wrap">wrap</button>
+            </div>
+          </div>
+        </div>
+        <div class="flex-stage" id="flexStage">
+          <div class="demo-item">1</div><div class="demo-item">2</div><div class="demo-item">3</div><div class="demo-item">4</div>
+        </div>
+      </div>
+
+      <div class="subhead">Navbar pattern</div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp7b"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp7b">nav { display: flex; justify-content: space-between; align-items: center; }</code></pre>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 8 — CSS GRID ============ -->
+    <section class="handbook-section" id="sec-8">
+      <div class="section-head">
+        <span class="section-num">08</span>
+        <div><h2>CSS Grid — Two-Dimensional Layout</h2>
+        <p class="section-intro">Arranges items in <b style="color:var(--text)">rows and columns simultaneously</b>. This is what powers a full dashboard layout.</p></div>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp8"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp8">.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);                      /* fr = fraction of remaining space */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* responsive, zero media queries */
+  grid-template-rows: auto 1fr auto;
+  gap: 1.5rem;
+}</code></pre>
+      </div>
+
+      <div class="subhead">The playground — three real patterns</div>
+      <div class="playground">
+        <div class="pill-group" id="gridPresetGroup" style="margin-bottom:16px;">
+          <button data-val="equal" class="active">3 equal columns</button>
+          <button data-val="autofit">auto-fit responsive</button>
+          <button data-val="areas">named areas — dashboard</button>
+        </div>
+        <div class="grid-stage" id="gridStage">
+          <div class="demo-item">1</div><div class="demo-item">2</div><div class="demo-item">3</div>
+        </div>
+      </div>
+
+      <div class="subhead">Named areas — the most readable way to build a real layout</div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp8b"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp8b">.dashboard {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar main"
+    "sidebar footer";
+}
+.header  { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main    { grid-area: main; }
+.footer  { grid-area: footer; }</code></pre>
+      </div>
+
+      <div class="subhead">Manual placement</div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp8c"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp8c">.item {
+  grid-column: 1 / 3;   /* start at line 1, end at line 3 — spans 2 columns */
+  grid-row: span 2;      /* spans 2 rows from wherever it lands */
+}</code></pre>
+      </div>
+      <div class="callout"><b>Subgrid</b> (Baseline since 2023) lets a nested grid's items align to the <i>parent</i> grid's tracks — a row of cards with uneven internal content can still line up their headings/buttons across the row: <code class="inline">grid-template-rows: subgrid;</code></div>
+    </section>
+
+    <!-- ============ SECTION 9 — POSITIONING ============ -->
+    <section class="handbook-section" id="sec-9">
+      <div class="section-head">
+        <span class="section-num">09</span>
+        <div><h2>Positioning</h2>
+        <p class="section-intro">Takes an element out of (or keeps it in) normal flow.</p></div>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp9"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp9">position: static;    /* default — normal document flow */
+position: relative;  /* stays in flow, offsets from where it WOULD be */
+position: absolute;  /* removed from flow, positioned relative to nearest
+                         non-static ancestor */
+position: fixed;      /* relative to the viewport, stays put on scroll */
+position: sticky;     /* relative until a scroll threshold, then fixed */</code></pre>
+      </div>
+      <div class="callout warn"><code class="inline">top</code>/<code class="inline">right</code>/<code class="inline">bottom</code>/<code class="inline">left</code> only do anything on non-<code class="inline">static</code> elements. If <code class="inline">z-index</code> "isn't working," the real problem is almost always a <b>stacking context trap</b>: a parent with <code class="inline">opacity</code>, <code class="inline">transform</code>, or <code class="inline">filter</code> silently creates a new stacking context.</div>
+
+      <div class="subhead">Try each value, live</div>
+      <div class="playground">
+        <div class="pill-group" id="positionGroup" style="margin-bottom:16px;">
+          <button data-val="static" class="active">static</button>
+          <button data-val="relative">relative</button>
+          <button data-val="absolute">absolute</button>
+          <button data-val="sticky">sticky</button>
+        </div>
+        <div id="positionStage" style="position:relative;background:var(--surface-2);border-radius:8px;height:150px;overflow-y:auto;padding:10px;">
+          <div style="height:60px;font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);">scroll me for sticky ↓</div>
+          <div id="positionBox" style="position:static;width:110px;padding:10px;background:linear-gradient(135deg,var(--coral),var(--gold));color:#1a1300;font-family:var(--font-mono);font-size:.78rem;border-radius:6px;top:10px;left:10px;">box</div>
+          <div style="height:220px;font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);">keep scrolling…</div>
+        </div>
+        <p id="positionNote" style="font-size:.78rem;color:var(--text-faint);margin-top:8px;"></p>
+      </div>
+
+      <div class="subhead">z-index &amp; stacking — swap which is on top</div>
+      <div class="live-panel">
+        <div class="live-label">Live</div>
+        <div style="position:relative;height:90px;">
+          <div id="zBoxA" style="position:absolute;top:10px;left:20px;width:100px;height:60px;background:var(--coral);border-radius:8px;z-index:1;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.75rem;color:#1a0505;">A · z:1</div>
+          <div id="zBoxB" style="position:absolute;top:30px;left:70px;width:100px;height:60px;background:var(--teal);border-radius:8px;z-index:2;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.75rem;color:#0b1512;">B · z:2</div>
+        </div>
+        <button class="btn" id="zSwapBtn" style="margin-top:10px;">Swap z-index</button>
+      </div>
+
+      <div class="callout"><b>Worth knowing about — Anchor Positioning</b>, crossing into Baseline through 2026: it tethers one element to another in pure CSS (a tooltip to its trigger button) without a JS positioning library — the exact job Floating UI and Popper.js were built to do.
+      <div class="code-panel" style="margin-top:10px;">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp9b"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp9b">.trigger { anchor-name: --my-anchor; }
+.tooltip { position: absolute; position-anchor: --my-anchor;
+           top: anchor(bottom); left: anchor(left); }</code></pre>
+      </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 10 — RESPONSIVE DESIGN ============ -->
+    <section class="handbook-section" id="sec-10">
+      <div class="section-head">
+        <span class="section-num">10</span>
+        <div><h2>Responsive Design: Media &amp; Container Queries</h2>
+        <p class="section-intro">Two different questions: "how big is the screen?" vs. "how big is the space I've been given?"</p></div>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp10"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp10">/* Mobile-first: base styles are mobile, media queries add complexity up */
+.grid { grid-template-columns: 1fr; }
+
+@media (min-width: 768px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}</code></pre>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp10b"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp10b">/* Container queries (Baseline since 2023) respond to a component's
+   OWN container width, not the screen */
+.card-wrapper { container-type: inline-size; }
+
+@container (min-width: 400px) {
+  .card { display: grid; grid-template-columns: 120px 1fr; }
+}</code></pre>
+      </div>
+      <div class="callout">This is the fix for the classic "this card looks great in the main grid but breaks when a designer drops it into a narrow sidebar" problem. <b>Rule of thumb:</b> media queries for page-level layout, container queries for reusable components.</div>
+
+      <div class="subhead">Drag the handle — this is a real @container query, not a fake</div>
+      <div class="playground">
+        <div class="slider-row" style="margin-bottom:14px;"><label>container width</label><input type="range" id="cqSlider" min="220" max="600" value="260"><span class="val" id="cqSliderVal">260px</span></div>
+        <div class="cq-container" id="cqContainer" style="width:260px;">
+          <div class="cq-card">
+            <div class="placeholder-img" style="height:60px;width:100%;">image</div>
+            <div>
+              <b style="font-size:.85rem;">Card title</b>
+              <p style="font-size:.78rem;color:var(--text-faint);margin:4px 0 0;">Stacks below 400px, sits side-by-side above it — same component, zero JS.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 11 — BORDERS, SHADOWS & FILTERS ============ -->
+    <section class="handbook-section" id="sec-11">
+      <div class="section-head">
+        <span class="section-num">11</span>
+        <div><h2>Borders, Shadows &amp; Filters</h2>
+        <p class="section-intro">Depth and edges — where flat divs start looking like real UI.</p></div>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp11"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp11">border: 1px solid #e5e7eb;
+border-radius: 12px;
+border-radius: 50%;                             /* circle, on a square element */
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);  /* a "glow" ring, e.g. focus states */
+filter: blur(4px) brightness(1.1);</code></pre>
+      </div>
+
+      <div class="subhead">Live — radius, shadow, blur</div>
+      <div class="playground">
+        <div class="playground-controls">
+          <div class="slider-row"><label>border-radius</label><input type="range" id="brRadius" min="0" max="60" value="12"><span class="val" id="brRadiusVal">12px</span></div>
+          <div class="slider-row"><label>shadow blur</label><input type="range" id="brShadow" min="0" max="50" value="12"><span class="val" id="brShadowVal">12px</span></div>
+          <div class="slider-row"><label>filter: blur()</label><input type="range" id="brFilter" min="0" max="10" value="0"><span class="val" id="brFilterVal">0px</span></div>
+        </div>
+        <div class="stage">
+          <div id="brBox" style="width:120px;height:80px;background:linear-gradient(135deg,var(--coral),var(--gold));border-radius:12px;box-shadow:0 12px 12px -4px rgba(0,0,0,.4);"></div>
+        </div>
+      </div>
+
+      <div class="subhead">Glassmorphism — the frosted-glass panel effect</div>
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp11b"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-css" id="bp11b">.glass-panel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Safari still wants this */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}</code></pre>
+        </div>
+        <div class="live-panel" style="background:linear-gradient(135deg,#6366f1,#ec4899);padding:26px;">
+          <div style="background:rgba(255,255,255,.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:16px;color:#fff;font-size:.85rem;">
+            Needs a semi-transparent background to actually show the blur through it.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 12 — TRANSITIONS, ANIMATIONS & TRANSFORMS ============ -->
+    <section class="handbook-section" id="sec-12">
+      <div class="section-head">
+        <span class="section-num">12</span>
+        <div><h2>Transitions, Animations &amp; Transforms</h2>
+        <p class="section-intro">Motion, done cheaply — animate <code class="inline">transform</code>, not <code class="inline">top</code>/<code class="inline">left</code>/<code class="inline">width</code>.</p></div>
+      </div>
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp12"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-css" id="bp12">.button {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.button:hover {
+  transform: translateY(-2px) scale(1.02);
+}</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — hover it</div>
+          <div class="live-stage" style="justify-content:center;">
+            <button style="transition:background-color .2s ease, transform .2s ease;background:var(--gold);color:#1a1300;border:none;padding:12px 22px;border-radius:8px;font-weight:600;font-family:var(--font-body);cursor:pointer;" onmouseover="this.style.transform='translateY(-2px) scale(1.02)'" onmouseout="this.style.transform='none'">Hover me</button>
+          </div>
+        </div>
+      </div>
+      <div class="callout"><code class="inline">transform</code> functions — <code class="inline">translateX/Y()</code>, <code class="inline">scale()</code>, <code class="inline">rotate()</code>, <code class="inline">skew()</code> — are GPU-accelerated and don't trigger layout recalculation.</div>
+
+      <div class="subhead">Transform playground</div>
+      <div class="playground">
+        <div class="playground-controls">
+          <div class="slider-row"><label>translateX</label><input type="range" id="tfX" min="-60" max="60" value="0"><span class="val" id="tfXVal">0px</span></div>
+          <div class="slider-row"><label>rotate</label><input type="range" id="tfR" min="-180" max="180" value="0"><span class="val" id="tfRVal">0deg</span></div>
+          <div class="slider-row"><label>scale</label><input type="range" id="tfS" min="50" max="150" value="100"><span class="val" id="tfSVal">1.0</span></div>
+        </div>
+        <div class="stage">
+          <div id="tfBox" style="width:90px;height:90px;background:linear-gradient(135deg,var(--teal),var(--lime));border-radius:10px;"></div>
+        </div>
+      </div>
+
+      <div class="subhead">Keyframe animations</div>
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp12b"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-css" id="bp12b">@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card { animation: fade-in 0.4s ease-out; }</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — replay it</div>
+          <div class="live-stage" style="justify-content:center;flex-direction:column;gap:12px;">
+            <div id="fadeInCard" style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:14px 20px;font-size:.85rem;">fade-in 0.4s ease-out</div>
+            <button class="btn" id="replayAnim">Replay animation</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout"><b>Newer</b> — animating things that used to be impossible, like transitioning <code class="inline">display: none</code> on/off:
+      <div class="code-panel" style="margin-top:10px;">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp12c"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp12c">@starting-style {
+  .popover[open] { opacity: 0; }
+}
+.popover {
+  transition: opacity 0.3s, display 0.3s allow-discrete;
+}</code></pre>
+      </div>
+      Also worth knowing: <b>scroll-driven animations</b> (<code class="inline">animation-timeline: scroll()</code> / <code class="inline">view()</code>) tie an animation's progress directly to scroll position — no JS scroll listener needed. Newer, less universal support — check coverage before shipping without a fallback.
+      </div>
+    </section>
+
+    <!-- ============ SECTION 13 — CUSTOM PROPERTIES ============ -->
+    <section class="handbook-section" id="sec-13">
+      <div class="section-head">
+        <span class="section-num">13</span>
+        <div><h2>Custom Properties (CSS Variables)</h2>
+        <p class="section-intro">Real runtime values — unlike Sass variables, you can read and change them with JavaScript, and override them per-component by redeclaring in a narrower scope. The actual mechanism behind most theme-switchers.</p></div>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp13"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp13">:root {
+  --color-primary: #6366f1;
+  --spacing-md: 1rem;
+  --radius: 12px;
+}
+.button {
+  background: var(--color-primary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius, 8px); /* fallback if undefined */
+}</code></pre>
+      </div>
+
+      <div class="subhead">Live variable editor — change one value, everything using it updates</div>
+      <div class="playground">
+        <div class="playground-controls">
+          <div class="control-group"><span class="lbl">--color-primary</span><input type="color" id="cpColor" value="#6366f1" style="height:38px;width:100px;border-radius:7px;border:1px solid var(--border);background:none;"></div>
+          <div class="slider-row"><label>--radius</label><input type="range" id="cpRadius" min="0" max="30" value="12"><span class="val" id="cpRadiusVal">12px</span></div>
+          <div class="slider-row"><label>--spacing-md</label><input type="range" id="cpSpacing" min="8" max="32" value="16"><span class="val" id="cpSpacingVal">16px</span></div>
+        </div>
+        <div class="stage" style="gap:14px;" id="cpStage">
+          <button id="cpButton" style="color:#fff;border:none;font-family:var(--font-body);font-weight:600;cursor:default;">.button</button>
+          <div id="cpCard" style="background:var(--surface);border-width:2px;border-style:solid;font-family:var(--font-mono);font-size:.78rem;color:var(--text-dim);">.card (reuses --color-primary as border)</div>
+        </div>
+      </div>
+
+      <div class="callout"><b>@property</b> (newer, progressive enhancement) gives a custom property an actual type, so the browser can smoothly <i>animate</i> it — plain custom properties can't be transitioned:
+      <div class="code-panel" style="margin-top:10px;">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp13b"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp13b">@property --angle {
+  syntax: "&lt;angle&gt;";
+  initial-value: 0deg;
+  inherits: false;
+}</code></pre>
+      </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 14 — MODERN CASCADE & ARCHITECTURE ============ -->
+    <section class="handbook-section" id="sec-14">
+      <div class="section-head">
+        <span class="section-num">14</span>
+        <div><h2>Modern Cascade &amp; Architecture Tools</h2>
+        <p class="section-intro">How current codebases stay organized without a preprocessor.</p></div>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp14"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp14">/* Native CSS Nesting — Baseline, all major engines. No build step. */
+.card {
+  padding: 1rem;
+  &amp; h2 { font-size: 1.5rem; }
+  &amp;:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+  &amp;__header { border-bottom: 1px solid #eee; }
+}</code></pre>
+      </div>
+      <div class="callout">Keep nesting to 2 levels or so — it's readable formatting, not a license to rebuild deep specificity chains.</div>
+
+      <div class="subhead">Cascade Layers (@layer)</div>
+      <p class="section-intro" style="margin-bottom:10px;">Explicitly control which group of rules wins, independent of specificity or source order. This is how modern codebases end specificity wars instead of reaching for <code class="inline">!important</code>.</p>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp14b"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp14b">@layer reset, base, components, utilities;
+
+@layer base {
+  h1 { font-size: 2rem; }
+}
+@layer components {
+  .card h1 { font-size: 1.5rem; } /* wins over @layer base even with
+                                      lower specificity — layer order
+                                      decides first */
+}</code></pre>
+      </div>
+
+      <div class="subhead">Logical properties — live</div>
+      <p class="section-intro" style="margin-bottom:10px;">Write layout that adapts automatically to right-to-left languages, instead of hardcoding <code class="inline">left</code>/<code class="inline">right</code>.</p>
+      <div class="demo">
+        <div class="code-panel" style="margin:0;">
+          <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp14c"><span class="cb-label">Copy</span></button></div>
+          <pre><code class="language-css" id="bp14c">margin-inline: 1rem;   /* instead of margin-left + margin-right */
+padding-block: 2rem;    /* instead of padding-top + padding-bottom */
+padding-inline-start: 24px;</code></pre>
+        </div>
+        <div class="live-panel">
+          <div class="live-label">Live — flip direction</div>
+          <div class="live-stage stack">
+            <label class="toggle-switch"><input type="checkbox" id="rtlToggle"><span class="track"><span class="thumb"></span></span> <span id="rtlLabel">ltr</span></label>
+            <div id="logicalBox" dir="ltr" style="background:var(--surface-2);border-radius:8px;padding-inline-start:28px;padding-block:12px;font-size:.82rem;">
+              <span style="background:var(--gold-soft);border-left:3px solid var(--gold);padding:2px 6px;" id="logicalMarker">padding-inline-start</span> always leads, regardless of direction.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 15 — OVERFLOW & SCROLL ============ -->
+    <section class="handbook-section" id="sec-15">
+      <div class="section-head">
+        <span class="section-num">15</span>
+        <div><h2>Overflow &amp; Scroll</h2>
+        <p class="section-intro">What happens when content doesn't fit its box.</p></div>
+      </div>
+      <div class="code-panel">
+        <div class="code-panel-bar"><span class="lang">css</span><button class="copy-btn" data-copy-target="bp15"><span class="cb-label">Copy</span></button></div>
+        <pre><code class="language-css" id="bp15">overflow: hidden;   /* clip content that doesn't fit */
+overflow: auto;      /* scrollbar appears only if needed */
+overflow: scroll;    /* scrollbar always shown */
+
+scroll-snap-type: x mandatory;   /* on a container, e.g. a carousel */
+scroll-snap-align: center;       /* on each child */
+
+scrollbar-width: thin;                  /* Baseline late 2024 */
+scrollbar-color: #6366f1 transparent;   /* thumb, track — no more
+                                            -webkit-scrollbar hacks */</code></pre>
+      </div>
+      <div class="subhead">Live — scroll-snap carousel, themed scrollbar</div>
+      <div class="live-panel">
+        <div class="live-label">Live — drag to scroll</div>
+        <div class="scroll-carousel">
+          <div class="card" style="background:linear-gradient(135deg,var(--coral),var(--gold));">1</div>
+          <div class="card" style="background:linear-gradient(135deg,var(--teal),var(--lime));">2</div>
+          <div class="card" style="background:linear-gradient(135deg,var(--gold),var(--lime));">3</div>
+          <div class="card" style="background:linear-gradient(135deg,var(--coral),var(--teal));">4</div>
+          <div class="card" style="background:linear-gradient(135deg,var(--lime),var(--gold));">5</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 16 — COMMON GOTCHAS ============ -->
+    <section class="handbook-section" id="sec-16">
+      <div class="section-head">
+        <span class="section-num">16</span>
+        <div><h2>Common Gotchas &amp; Debugging</h2>
+        <p class="section-intro">Symptom on the left, real cause on the right.</p></div>
+      </div>
+      <div class="debug-card"><b>"My margin isn't the size I set"</b><p>Margin collapsing (§03), or a parent with padding/border you forgot about.</p></div>
+      <div class="debug-card"><b>"z-index isn't working"</b><p>Check for a stacking-context trap: a parent with <code class="inline">opacity</code>, <code class="inline">transform</code>, or <code class="inline">filter</code> silently creates a new stacking context that traps your <code class="inline">z-index</code> inside it.</p></div>
+      <div class="debug-card"><b>"My flex items won't shrink below their content size"</b><p>Set <code class="inline">min-width: 0</code> on the flex item — flex items default to <code class="inline">min-width: auto</code>, which can force overflow.</p></div>
+      <div class="debug-card"><b>em compounding</b><p>Nested elements each multiply <code class="inline">em</code> by their parent's font-size. Use <code class="inline">rem</code> unless you specifically want that compounding behavior.</p></div>
+      <div class="debug-card"><b>!important everywhere</b><p>Almost always a specificity or cascade-layer problem being papered over. Fix the actual specificity instead of escalating.</p></div>
+    </section>
+
+    <!-- ============ SECTION 17 — OUTDATED PATTERNS ============ -->
+    <section class="handbook-section" id="sec-17">
+      <div class="section-head">
+        <span class="section-num">17</span>
+        <div><h2>⚠️ Outdated Patterns — Don't Learn CSS From a Tutorial Still Using These</h2>
+        <p class="section-intro">Same spirit as avoiding Create React App in the JS world — reliable signals a tutorial predates modern CSS.</p></div>
+      </div>
+      <div class="chip-grid">
+        <span class="el-chip deprecated">float: left for layout<span class="use-instead">use Flexbox / Grid</span></span>
+        <span class="el-chip deprecated">clearfix hacks<span class="use-instead">not needed with Flexbox/Grid</span></span>
+        <span class="el-chip deprecated">table-based layout<span class="use-instead">tables are for tabular data</span></span>
+        <span class="el-chip deprecated">-webkit-/-moz- prefixes<span class="use-instead">mostly unneeded now*</span></span>
+        <span class="el-chip deprecated">fixed px-only typography<span class="use-instead">use rem / clamp()</span></span>
+        <span class="el-chip deprecated">Sass/LESS just for nesting/vars<span class="use-instead">native CSS covers it now</span></span>
+      </div>
+      <div class="callout">*<code class="inline">-webkit-backdrop-filter</code> is a real, current exception — Safari genuinely still wants it (see §11). And Sass still earns its place for loops/mixins on large design systems — just don't reach for it on day one assuming CSS can't nest.</div>
+    </section>
+
+    <!-- ============ SECTION 18 — DECISION CHEAT SHEETS ============ -->
+    <section class="handbook-section" id="sec-18">
+      <div class="section-head">
+        <span class="section-num">18</span>
+        <div><h2>Quick Decision Cheat Sheets</h2>
+        <p class="section-intro">Three questions you'll ask yourself constantly.</p></div>
+      </div>
+      <div class="entries">
+        <div class="spec-row"><code class="tag-chip">Flexbox or Grid?</code><div class="spec-body"><p class="spec-purpose">One dimension (a row of nav links, a stack of cards) → <b style="color:var(--text)">Flexbox</b>. Two dimensions at once (a full page layout, a dashboard) → <b style="color:var(--text)">Grid</b>. They combine constantly: Grid for the page skeleton, Flexbox inside individual components.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">rem, em, or px?</code><div class="spec-body"><p class="spec-purpose">Font sizes, spacing, layout dimensions → <b style="color:var(--text)">rem</b>. Something that scales with its own element's font-size (icon next to text, padding inside a button) → <b style="color:var(--text)">em</b>. Borders, and only borders → <b style="color:var(--text)">px</b> is genuinely fine.</p></div></div>
+        <div class="spec-row"><code class="tag-chip">Media or container query?</code><div class="spec-body"><p class="spec-purpose">Whole-page layout decisions → <b style="color:var(--text)">media query</b>. A reusable component that needs to adapt to wherever it's dropped → <b style="color:var(--text)">container query</b>.</p></div></div>
+      </div>
+      <div style="text-align:center;margin-top:24px;">
+        <button class="btn primary" id="openWizard2" style="padding:13px 26px;font-size:.9rem;">🧭 Try the interactive Decision Helper instead</button>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>Everything above is what Tailwind's utility classes (<code class="inline">flex</code>, <code class="inline">grid-cols-3</code>, <code class="inline">p-4</code>, <code class="inline">rounded-xl</code>) compile down to under the hood — so it'll feel like a shorthand you already understand, not a new language.</p>
+      <p>Converted from a Markdown handbook into a live reference — every playground above runs real CSS, not a screenshot.</p>
+    </footer>
+  </main>
+</div>
+
+<!-- CSS Decision Helper dialog -->
+<dialog id="wizardDialog">
+  <div class="dialog-body">
+    <h3 style="margin-bottom:2px;">CSS Decision Helper</h3>
+    <p style="margin-bottom:16px;font-size:.82rem;">Pick a question:</p>
+    <div id="wizardMenu" style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn" data-topic="flexgrid" style="text-align:left;">Flexbox or Grid?</button>
+      <button class="btn" data-topic="units" style="text-align:left;">rem, em, or px?</button>
+      <button class="btn" data-topic="query" style="text-align:left;">Media or container query?</button>
+    </div>
+    <div class="wizard-result" id="wizardResult">
+      <code class="tag-chip" id="wizardResultTag" style="font-size:1.1rem;"></code>
+      <p id="wizardResultText"></p>
+      <div class="wizard-actions" style="margin-top:16px;">
+        <button class="btn primary" id="wizardRestart" style="flex:1;">Back</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast"><span class="dot"></span><span id="toastText"></span></div>
+<button id="backToTop" aria-label="Back to top">↑</button>
+
+<noscript>
+  <div style="position:fixed;bottom:0;left:0;right:0;background:#1f2330;color:#eceef4;padding:12px 20px;font-family:sans-serif;font-size:.85rem;text-align:center;border-top:1px solid #2b3040;z-index:999;">
+    This reference reads fine without JavaScript — search, copy buttons, and the live playgrounds need it, though. All content below still works.
+  </div>
+</noscript>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+  /* ---------- syntax highlighting ---------- */
+  if(window.hljs){ hljs.highlightAll(); } else {
+    window.addEventListener('load', function(){ if(window.hljs) hljs.highlightAll(); });
+  }
+
+  var reduceMotionGlobal = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- reading progress bar ---------- */
+  var progressBar = document.getElementById('progressBar');
+  function updateProgress(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progressBar.style.width = (scrolled||0) + '%';
+  }
+  document.addEventListener('scroll', updateProgress, {passive:true});
+  updateProgress();
+
+  /* ---------- back to top ---------- */
+  var backToTop = document.getElementById('backToTop');
+  document.addEventListener('scroll', function(){
+    backToTop.classList.toggle('show', window.scrollY > 700);
+  }, {passive:true});
+  backToTop.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+
+  /* ---------- mobile sidebar ---------- */
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+  var menuToggle = document.getElementById('menuToggle');
+  function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('show'); menuToggle.setAttribute('aria-expanded','false'); }
+  function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('show'); menuToggle.setAttribute('aria-expanded','true'); }
+  menuToggle.addEventListener('click', function(){ sidebar.classList.contains('open') ? closeSidebar() : openSidebar(); });
+  overlay.addEventListener('click', closeSidebar);
+  document.getElementById('sideNav').addEventListener('click', function(e){ if(e.target.tagName==='A') closeSidebar(); });
+
+  /* ---------- sidebar scroll-spy ---------- */
+  var navLinks = Array.from(document.querySelectorAll('#sideNav a'));
+  var sections = navLinks.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  var spy = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      var link = navLinks.find(function(a){ return a.getAttribute('href') === '#' + entry.target.id; });
+      if(!link) return;
+      if(entry.isIntersecting){
+        navLinks.forEach(function(a){ a.classList.remove('active'); });
+        link.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-15% 0px -70% 0px'});
+  sections.forEach(function(s){ spy.observe(s); });
+
+  /* ---------- copy buttons ---------- */
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var targetId = btn.getAttribute('data-copy-target');
+      var codeEl = document.getElementById(targetId);
+      if(!codeEl) return;
+      var text = codeEl.textContent;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.classList.add('copied');
+        var label = btn.querySelector('.cb-label');
+        var prev = label.textContent;
+        label.textContent = 'Copied!';
+        setTimeout(function(){ label.textContent = prev; btn.classList.remove('copied'); }, 1500);
+      }).catch(function(){});
+    });
+  });
+
+  /* ================================================================
+     SECTION 1 -- specificity battle + inheritance
+     ================================================================ */
+  var specText = document.getElementById('specBattleText');
+  var specResult = document.getElementById('specBattleResult');
+  var specId = document.getElementById('specToggleId');
+  var specClass = document.getElementById('specToggleClass');
+  var specImportant = document.getElementById('specToggleImportant');
+  function updateSpecBattle(){
+    var idOn = specId.checked, classOn = specClass.checked, importantOn = specImportant.checked;
+    var color, msg;
+    if(classOn && importantOn){
+      color = '#ff7a85'; msg = '.link wins -- !important beats specificity entirely, regardless of the #nav .link rule.';
+    } else if(idOn){
+      color = '#7fd8c4'; msg = '#nav .link wins -- specificity 110 beats 10.';
+    } else if(classOn){
+      color = '#ff7a85'; msg = '.link wins -- it is the only enabled rule.';
+    } else {
+      color = '#9aa0b6'; msg = 'Neither rule is enabled -- default color shows.';
+    }
+    specText.style.color = color;
+    specResult.textContent = msg;
+  }
+  [specId, specClass, specImportant].forEach(function(el){ el.addEventListener('change', updateSpecBattle); });
+  updateSpecBattle();
+
+  /* ================================================================
+     SECTION 2 -- :has() demo
+     ================================================================ */
+  var hasBtn = document.getElementById('hasToggleBtn');
+  var hasSlot = document.getElementById('hasImgSlot');
+  var hasHasImg = false;
+  if(hasBtn){
+    hasBtn.addEventListener('click', function(){
+      hasHasImg = !hasHasImg;
+      if(hasHasImg){
+        hasSlot.innerHTML = '<div class="placeholder-img" style="height:50px;">img</div>';
+        hasBtn.textContent = 'Remove the <img>';
+      } else {
+        hasSlot.innerHTML = '';
+        hasBtn.textContent = 'Add an <img> to the card';
+      }
+    });
+  }
+
+  /* ================================================================
+     SECTION 3 -- box model + margin collapse
+     ================================================================ */
+  var bmPadding = document.getElementById('bmPadding'), bmBorder = document.getElementById('bmBorder'), bmMargin = document.getElementById('bmMargin');
+  var bmContentBox = document.getElementById('bmContentBox'), bmBorderBox = document.getElementById('bmBorderBox'), bmMarginBox = document.getElementById('bmMarginBox');
+  var bmTotalOut = document.getElementById('bmTotalOut');
+  var boxSizingGroup = document.getElementById('boxSizingGroup');
+  function updateBoxModel(){
+    var padding = +bmPadding.value, border = +bmBorder.value, margin = +bmMargin.value;
+    var sizing = boxSizingGroup.querySelector('button.active').dataset.val;
+    var authored = 120, contentW, total;
+    if(sizing === 'border-box'){
+      contentW = Math.max(authored - 2*padding - 2*border, 16);
+      total = authored;
+    } else {
+      contentW = authored;
+      total = authored + 2*padding + 2*border;
+    }
+    bmContentBox.style.width = contentW + 'px';
+    bmBorderBox.style.padding = padding + 'px';
+    bmBorderBox.style.borderWidth = border + 'px';
+    bmMarginBox.style.padding = margin + 'px';
+    document.getElementById('bmPaddingVal').textContent = padding+'px';
+    document.getElementById('bmBorderVal').textContent = border+'px';
+    document.getElementById('bmMarginVal').textContent = margin+'px';
+    bmTotalOut.textContent = 'rendered width: ' + total + 'px (authored width: 120px, ' + sizing + ')';
+  }
+  [bmPadding, bmBorder, bmMargin].forEach(function(el){ el.addEventListener('input', updateBoxModel); });
+  boxSizingGroup.querySelectorAll('button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      boxSizingGroup.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      updateBoxModel();
+    });
+  });
+  updateBoxModel();
+
+  var mcA = document.getElementById('mcA'), mcB = document.getElementById('mcB');
+  var mcBoxA = document.getElementById('mcBoxA'), mcBoxB = document.getElementById('mcBoxB'), mcResult = document.getElementById('mcResult');
+  function updateMC(){
+    var a = +mcA.value, b = +mcB.value;
+    mcBoxA.style.marginBottom = a+'px';
+    mcBoxB.style.marginTop = b+'px';
+    document.getElementById('mcAVal').textContent = a+'px';
+    document.getElementById('mcBVal').textContent = b+'px';
+    mcResult.textContent = 'Actual gap: ' + Math.max(a,b) + 'px (the larger of the two, not ' + (a+b) + 'px)';
+  }
+  [mcA, mcB].forEach(function(el){ el.addEventListener('input', updateMC); });
+  updateMC();
+
+  /* ================================================================
+     SECTION 4 -- clamp() simulator
+     ================================================================ */
+  var clampSlider = document.getElementById('clampSlider'), clampText = document.getElementById('clampText'), clampBreakdown = document.getElementById('clampBreakdown');
+  function updateClamp(){
+    var vw = +clampSlider.value;
+    var preferred = vw*0.02 + 16;
+    var min = 16, max = 40;
+    var clamped = Math.min(Math.max(preferred, min), max);
+    clampText.style.fontSize = clamped + 'px';
+    document.getElementById('clampSliderVal').textContent = vw+'px';
+    var active = preferred < min ? 'min (1rem)' : (preferred > max ? 'max (2.5rem)' : 'preferred (2vw + 1rem)');
+    clampBreakdown.textContent = 'min: 16px \u00b7 preferred: ' + preferred.toFixed(1) + 'px \u00b7 max: 40px  \u2192  using ' + active + ' = ' + clamped.toFixed(1) + 'px';
+  }
+  clampSlider.addEventListener('input', updateClamp);
+  updateClamp();
+
+  /* ================================================================
+     SECTION 5 -- typography sliders + toggles
+     ================================================================ */
+  var typoLH = document.getElementById('typoLH'), typoLS = document.getElementById('typoLS'), typoSample = document.getElementById('typoSample');
+  function updateTypo(){
+    var lh = (+typoLH.value/10).toFixed(2);
+    var ls = (+typoLS.value/100).toFixed(2);
+    typoSample.style.lineHeight = lh;
+    typoSample.style.letterSpacing = ls+'em';
+    document.getElementById('typoLHVal').textContent = lh;
+    document.getElementById('typoLSVal').textContent = ls+'em';
+  }
+  [typoLH, typoLS].forEach(function(el){ el.addEventListener('input', updateTypo); });
+  updateTypo();
+
+  var ellipsisToggle = document.getElementById('ellipsisToggle'), ellipsisDemo = document.getElementById('ellipsisDemo');
+  ellipsisToggle.addEventListener('change', function(){
+    if(ellipsisToggle.checked){
+      ellipsisDemo.style.overflow='hidden'; ellipsisDemo.style.whiteSpace='nowrap'; ellipsisDemo.style.textOverflow='ellipsis';
+    } else {
+      ellipsisDemo.style.overflow='visible'; ellipsisDemo.style.whiteSpace='normal'; ellipsisDemo.style.textOverflow='clip';
+    }
+  });
+
+  var balanceToggle = document.getElementById('balanceToggle'), balanceDemo = document.getElementById('balanceDemo');
+  balanceToggle.addEventListener('change', function(){
+    balanceDemo.style.textWrap = balanceToggle.checked ? 'balance' : 'wrap';
+  });
+
+  /* ================================================================
+     SECTION 6 -- dark mode toggle
+     ================================================================ */
+  var darkModeToggle = document.getElementById('darkModeToggle'), darkModeCard = document.getElementById('darkModeCard'), darkModeLabel = document.getElementById('darkModeLabel');
+  function updateDarkMode(){
+    var dark = darkModeToggle.checked;
+    darkModeCard.style.colorScheme = dark ? 'dark' : 'light';
+    darkModeLabel.textContent = dark ? 'dark' : 'light';
+  }
+  darkModeToggle.addEventListener('change', updateDarkMode);
+  updateDarkMode();
+
+  /* ================================================================
+     SECTION 7 -- flexbox playground
+     ================================================================ */
+  document.querySelectorAll('#sec-7 .pill-group[data-prop]').forEach(function(group){
+    var prop = group.dataset.prop;
+    group.querySelectorAll('button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        group.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('flexStage').style[prop] = btn.dataset.val;
+      });
+    });
+  });
+
+  /* ================================================================
+     SECTION 8 -- grid playground
+     ================================================================ */
+  var gridPresets = {
+    equal: {cols:'repeat(3, 1fr)', rows:'', areas:'none', html:'<div class="demo-item">1</div><div class="demo-item">2</div><div class="demo-item">3</div>'},
+    autofit: {cols:'repeat(auto-fit, minmax(90px, 1fr))', rows:'', areas:'none', html:'<div class="demo-item">1</div><div class="demo-item">2</div><div class="demo-item">3</div><div class="demo-item">4</div><div class="demo-item">5</div>'},
+    areas: {cols:'90px 1fr', rows:'auto 1fr auto', areas:'"sidebar header" "sidebar main" "sidebar footer"',
+      html:'<div class="demo-item" style="grid-area:header;">header</div><div class="demo-item" style="grid-area:sidebar;">sidebar</div><div class="demo-item" style="grid-area:main;">main</div><div class="demo-item" style="grid-area:footer;">footer</div>'}
+  };
+  var gridStage = document.getElementById('gridStage');
+  document.querySelectorAll('#gridPresetGroup button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('#gridPresetGroup button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var preset = gridPresets[btn.dataset.val];
+      gridStage.style.gridTemplateColumns = preset.cols;
+      gridStage.style.gridTemplateRows = preset.rows;
+      gridStage.style.gridTemplateAreas = preset.areas;
+      gridStage.innerHTML = preset.html;
+    });
+  });
+
+  /* ================================================================
+     SECTION 9 -- positioning + z-index
+     ================================================================ */
+  var positionNotes = {
+    static: 'static -- ignores top/left entirely, sits in normal flow.',
+    relative: 'relative -- nudged from where it would sit via top/left, but still reserves its original space.',
+    absolute: 'absolute -- removed from flow, positioned against the nearest non-static ancestor (here, the stage itself).',
+    sticky: 'sticky -- scroll the panel above; it sticks once it hits the top of this scrollable area.'
+  };
+  var positionBox = document.getElementById('positionBox');
+  document.querySelectorAll('#positionGroup button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('#positionGroup button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var val = btn.dataset.val;
+      positionBox.style.position = val;
+      if(val==='sticky'){ positionBox.style.top='0px'; positionBox.style.left='auto'; }
+      else if(val==='absolute' || val==='relative'){ positionBox.style.top='10px'; positionBox.style.left='10px'; }
+      else { positionBox.style.top=''; positionBox.style.left=''; }
+      document.getElementById('positionNote').textContent = positionNotes[val];
+    });
+  });
+
+  var zBoxA = document.getElementById('zBoxA');
+  var aOnTop = false;
+  document.getElementById('zSwapBtn').addEventListener('click', function(){
+    aOnTop = !aOnTop;
+    zBoxA.style.zIndex = aOnTop ? 3 : 1;
+    zBoxA.textContent = 'A \u00b7 z:' + (aOnTop ? 3 : 1);
+  });
+
+  /* ================================================================
+     SECTION 10 -- container query slider
+     ================================================================ */
+  var cqSlider = document.getElementById('cqSlider'), cqContainer = document.getElementById('cqContainer');
+  cqSlider.addEventListener('input', function(){
+    cqContainer.style.width = cqSlider.value + 'px';
+    document.getElementById('cqSliderVal').textContent = cqSlider.value + 'px';
+  });
+
+  /* ================================================================
+     SECTION 11 -- borders/shadow/filter sliders
+     ================================================================ */
+  var brRadius = document.getElementById('brRadius'), brShadow = document.getElementById('brShadow'), brFilter = document.getElementById('brFilter'), brBox = document.getElementById('brBox');
+  function updateBorders(){
+    var r=+brRadius.value, s=+brShadow.value, f=+brFilter.value;
+    brBox.style.borderRadius = r+'px';
+    brBox.style.boxShadow = '0 ' + s + 'px ' + s + 'px -4px rgba(0,0,0,.4)';
+    brBox.style.filter = f>0 ? 'blur('+f+'px)' : 'none';
+    document.getElementById('brRadiusVal').textContent = r+'px';
+    document.getElementById('brShadowVal').textContent = s+'px';
+    document.getElementById('brFilterVal').textContent = f+'px';
+  }
+  [brRadius, brShadow, brFilter].forEach(function(el){ el.addEventListener('input', updateBorders); });
+  updateBorders();
+
+  /* ================================================================
+     SECTION 12 -- transform playground + replay animation
+     ================================================================ */
+  var tfX = document.getElementById('tfX'), tfR = document.getElementById('tfR'), tfS = document.getElementById('tfS'), tfBox = document.getElementById('tfBox');
+  function updateTransform(){
+    var x=+tfX.value, r=+tfR.value, s=(+tfS.value/100).toFixed(2);
+    tfBox.style.transform = 'translateX(' + x + 'px) rotate(' + r + 'deg) scale(' + s + ')';
+    document.getElementById('tfXVal').textContent = x+'px';
+    document.getElementById('tfRVal').textContent = r+'deg';
+    document.getElementById('tfSVal').textContent = s;
+  }
+  [tfX, tfR, tfS].forEach(function(el){ el.addEventListener('input', updateTransform); });
+  updateTransform();
+
+  var replayBtn = document.getElementById('replayAnim'), fadeInCard = document.getElementById('fadeInCard');
+  replayBtn.addEventListener('click', function(){
+    fadeInCard.style.animation = 'none';
+    void fadeInCard.offsetWidth;
+    fadeInCard.style.animation = reduceMotionGlobal ? 'none' : 'fadeInDemo .4s ease-out';
+  });
+
+  /* ================================================================
+     SECTION 13 -- live CSS custom property editor
+     ================================================================ */
+  var cpColor = document.getElementById('cpColor'), cpRadius = document.getElementById('cpRadius'), cpSpacing = document.getElementById('cpSpacing'), cpStage = document.getElementById('cpStage');
+  function updateCustomProps(){
+    cpStage.style.setProperty('--color-primary', cpColor.value);
+    cpStage.style.setProperty('--radius', cpRadius.value+'px');
+    cpStage.style.setProperty('--spacing-md', cpSpacing.value+'px');
+    document.getElementById('cpRadiusVal').textContent = cpRadius.value+'px';
+    document.getElementById('cpSpacingVal').textContent = cpSpacing.value+'px';
+  }
+  [cpColor, cpRadius, cpSpacing].forEach(function(el){ el.addEventListener('input', updateCustomProps); });
+  updateCustomProps();
+
+  /* ================================================================
+     SECTION 14 -- logical properties RTL toggle
+     ================================================================ */
+  var rtlToggle = document.getElementById('rtlToggle'), logicalBox = document.getElementById('logicalBox'), rtlLabel = document.getElementById('rtlLabel');
+  rtlToggle.addEventListener('change', function(){
+    var rtl = rtlToggle.checked;
+    logicalBox.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+    rtlLabel.textContent = rtl ? 'rtl' : 'ltr';
+  });
+
+  /* ================================================================
+     HERO -- feature specimen rotator
+     ================================================================ */
+  var specimens = [
+    [':has()', 'The "parent selector" CSS never had until now -- style an element based on what is inside it. Baseline since late 2023.'],
+    ['clamp()', 'Fluid sizing in one line: min, preferred, max. Replaces a whole tier of @media breakpoints for font-size scaling.'],
+    ['@container', "Respond to a component's own width, not the screen -- the actual fix for cards that break in narrow sidebars."],
+    ['subgrid', "Lets a nested grid align to its parent grid's tracks -- uneven cards can still line up their headings across a row."],
+    ['color-mix()', 'Blend two colors directly in CSS -- no design tool, no Sass function, needed.'],
+    ['@property', 'Gives a custom property an actual type, so the browser can smoothly animate it -- plain custom properties cannot be transitioned.'],
+    ['light-dark()', 'One line picks the right color for the current color-scheme automatically -- the real mechanism behind most theme switchers now.'],
+    ['text-wrap: balance', 'Balances line lengths in a heading so you never get one awkward orphan word on its own line.'],
+    ['anchor positioning', 'Tethers one element to another in pure CSS -- the exact job Floating UI and Popper.js were built to do.'],
+    ['@layer', 'Explicitly controls which group of rules wins, independent of specificity -- how modern codebases end specificity wars.']
+  ];
+  var specimenIdx = 0;
+  var specimenTag = document.getElementById('specimenTag');
+  var specimenPurpose = document.getElementById('specimenPurpose');
+  var specimenIndex = document.getElementById('specimenIndex');
+  var specimenEl = document.getElementById('specimen');
+  var specimenDots = document.getElementById('specimenDots');
+  specimens.forEach(function(){ specimenDots.appendChild(document.createElement('span')); });
+  function renderSpecimen(){
+    Array.from(specimenDots.children).forEach(function(d,i){ d.classList.toggle('on', i===specimenIdx); });
+    specimenEl.classList.add('fade');
+    setTimeout(function(){
+      specimenTag.textContent = specimens[specimenIdx][0];
+      specimenPurpose.textContent = specimens[specimenIdx][1];
+      specimenIndex.textContent = String(specimenIdx+1).padStart(2,'0');
+      specimenEl.classList.remove('fade');
+    }, 220);
+  }
+  function nextSpecimen(){ specimenIdx = (specimenIdx+1) % specimens.length; renderSpecimen(); }
+  renderSpecimen();
+  document.getElementById('specimenNext').addEventListener('click', function(){ nextSpecimen(); resetSpecimenTimer(); });
+  var specimenTimer;
+  function resetSpecimenTimer(){
+    clearInterval(specimenTimer);
+    if(!reduceMotionGlobal){ specimenTimer = setInterval(nextSpecimen, 4200); }
+  }
+  resetSpecimenTimer();
+
+  /* ================================================================
+     SEARCH / find-in-page
+     ================================================================ */
+  var searchInput = document.getElementById('searchInput');
+  var searchCount = document.getElementById('searchCount');
+  var prevMatch = document.getElementById('prevMatch');
+  var nextMatch = document.getElementById('nextMatch');
+  var currentMatches = [];
+  var currentIdx = -1;
+
+  function clearHighlights(){
+    document.querySelectorAll('.is-match,.is-current').forEach(function(el){ el.classList.remove('is-match','is-current'); });
+  }
+  function runSearch(){
+    var q = searchInput.value.trim().toLowerCase().replace(/[<>\/]/g,'');
+    clearHighlights();
+    if(!q){
+      searchCount.textContent = '';
+      currentMatches = []; currentIdx = -1;
+      prevMatch.disabled = true; nextMatch.disabled = true;
+      return;
+    }
+    var candidates = Array.from(document.querySelectorAll('.spec-row, .el-chip, .debug-card'));
+    currentMatches = candidates.filter(function(el){ return el.textContent.toLowerCase().indexOf(q) !== -1; });
+    currentMatches.forEach(function(el){ el.classList.add('is-match'); });
+    currentIdx = currentMatches.length ? 0 : -1;
+    updateMatchUI();
+  }
+  function updateMatchUI(){
+    document.querySelectorAll('.is-current').forEach(function(el){ el.classList.remove('is-current'); });
+    if(currentMatches.length){
+      searchCount.textContent = (currentIdx+1) + ' of ' + currentMatches.length;
+      var el = currentMatches[currentIdx];
+      el.classList.add('is-current');
+      el.scrollIntoView({behavior: reduceMotionGlobal ? 'auto' : 'smooth', block:'center'});
+      prevMatch.disabled = false; nextMatch.disabled = false;
+    } else {
+      searchCount.textContent = 'No matches';
+      prevMatch.disabled = true; nextMatch.disabled = true;
+    }
+  }
+  function goNext(){ if(!currentMatches.length) return; currentIdx = (currentIdx+1) % currentMatches.length; updateMatchUI(); }
+  function goPrev(){ if(!currentMatches.length) return; currentIdx = (currentIdx-1+currentMatches.length) % currentMatches.length; updateMatchUI(); }
+
+  searchInput.addEventListener('input', runSearch);
+  searchInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); e.shiftKey ? goPrev() : goNext(); }
+    if(e.key === 'Escape'){ searchInput.value=''; runSearch(); searchInput.blur(); }
+  });
+  nextMatch.addEventListener('click', goNext);
+  prevMatch.addEventListener('click', goPrev);
+  document.addEventListener('keydown', function(e){
+    if(e.key === '/' && document.activeElement !== searchInput){ e.preventDefault(); searchInput.focus(); }
+  });
+
+  /* ================================================================
+     CSS DECISION HELPER dialog
+     ================================================================ */
+  var wizardContent = {
+    flexgrid: {tag:'Flexbox or Grid?', text:"One dimension (a row of nav links, a stack of cards) leads to Flexbox. Two dimensions at once (a full page layout, a dashboard) leads to Grid. They combine constantly: Grid for the page skeleton, Flexbox inside individual components."},
+    units: {tag:'rem, em, or px?', text:"Font sizes, spacing, layout dimensions: use rem. Something that scales with its own element's font-size (icon next to text, padding inside a button): use em. Borders, and only borders: px is genuinely fine."},
+    query: {tag:'Media or container query?', text:"Whole-page layout decisions: media query. A reusable component that needs to adapt to wherever it's dropped: container query."}
+  };
+  var wizardDialog = document.getElementById('wizardDialog');
+  var wizardMenu = document.getElementById('wizardMenu');
+  var wizardResult = document.getElementById('wizardResult');
+  document.querySelectorAll('#wizardMenu button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var data = wizardContent[btn.dataset.topic];
+      wizardMenu.style.display = 'none';
+      wizardResult.classList.add('show');
+      document.getElementById('wizardResultTag').textContent = data.tag;
+      document.getElementById('wizardResultText').textContent = data.text;
+    });
+  });
+  document.getElementById('wizardRestart').addEventListener('click', function(){
+    wizardMenu.style.display = 'flex';
+    wizardResult.classList.remove('show');
+  });
+  function openWizard(){
+    wizardMenu.style.display = 'flex';
+    wizardResult.classList.remove('show');
+    wizardDialog.showModal();
+  }
+  document.getElementById('openWizard').addEventListener('click', openWizard);
+  var openWizard2 = document.getElementById('openWizard2');
+  if(openWizard2) openWizard2.addEventListener('click', openWizard);
+
+});
+</script>
+</body>
+</html>
