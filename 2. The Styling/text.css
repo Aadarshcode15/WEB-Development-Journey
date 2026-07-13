@@ -8,7 +8,7 @@ h2 {
 }
 p {
     text-align: justify;
-    text-decoration: aqua underline wavy;
+    text-decoration: rgb(30, 0, 255) underline dotted;
 }
 a {
     text-decoration: none;
