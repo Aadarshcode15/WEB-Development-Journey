@@ -39,3 +39,14 @@ p + h3 {
 div > input {
     background-color: darksalmon;
 }
+
+input[type="text"] {
+    color: green;
+}
+input[type="password"] {
+    color: red;
+}
+
+input[type] {
+    background-color: ghostwhite;
+}
