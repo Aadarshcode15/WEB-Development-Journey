@@ -26,3 +26,12 @@ h3,h1 {
 nav ul li a {
     color: pink;
 }
+
+p + h3 {
+    text-decoration: underline;
+}
+
+.upvote + button {
+    background-color: cornflowerblue;
+    color: black;
+}
